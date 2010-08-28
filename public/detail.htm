@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>bitsuckr</title>
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="stylesheet" href="main.css" />
+    
+  </head>
+  <body>
+    <div class="head"><img src="bitsuckr-head.png"/><h1>Bitsuckr</h1></div>
+    <form action="/upload" method="post" class="uploadform">
+      <input name="torrentfile" type="file" class="fileinput"/>
+    </form>
+    <ul>
+      <li class="file"><a href="#">Some File</a></li>
+      <li class="opened-dir">
+        <a href="#" class="selected">Some Dir</a>
+        <ul>
+          <li class="closed-dir"><a href="#">Some Dir</a></li>
+          <li class="file">
+            <a href="#" class="selected">Some File</a>
+            <div class="filemenu">
+              <a href="#">View</a>
+              <a href="#">Url</a>
+            </div>
+            <div class="video">
+              <video width="560" height="340" controls>
+                <source src="somevideo.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+                <source src="somevideo.ogv" type='video/ogg; codecs="theora, vorbis"'>
+                <object width="640" height="384" type="application/x-shockwave-flash" data="somevideo.bla">
+                  <param name="movie" value="somevideo.bla" />
+                </object>
+              </video>
+            </div>
+          </li>
+        </ul>
+      </li>
+      <li class="closed-dir"><a href="#">Some Dir</a></li>
+    </ul>
+    <p class="bottom"></p>
+  </body>
+</html>
