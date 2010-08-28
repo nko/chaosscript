@@ -16,10 +16,12 @@ module.exports = {
     },
     index: function( torrents ) {
         var M = module.exports;
-        var someContent = M.tag( 'input', { 'name':'torrentfile',
-                                             'type':'file',
-                                             'class': 'fileinput'});
-        someContent += M.tag('input', {'type':'submit'});
+        var someContent = M.tag( 'label', { for: 'fileinput' }, 'Stream a .torrent file' );
+	someContent += M.tag( 'input', { 'name':'torrentfile',
+					    'id':'fileinput',
+                                            'type':'file',
+                                            'class': 'fileinput'});
+        someContent += M.tag('input', {'type':'submit', 'value':'Ok'});
         someContent = M.tag( 'form', { action:'/up',
                                         method:'post',
                                         enctype:'multipart/form-data',
