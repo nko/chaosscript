@@ -29,7 +29,7 @@ Peer.prototype.connect = function() {
 		       that.wire.on('established', function() {
 					console.log('established');
 					that.state = 'connected';
-					that.wire.piecemap(that.ctx.piecemap);
+					that.wire.bitfield(that.ctx.piecemap);
 					that.wire.interested();
 				    });
 		       that.wire.on('pkt', function(pkt) {
