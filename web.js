@@ -4,6 +4,7 @@ var BEnc = require('benc');
 var Model = require('./model');
 var TorrentManager = require('./torrent_manager');
 var Html = require('./html');
+var sys = require('sys');
 
 Html.setTemplate('./public/template.htm');
 var legalTorrents = ['0f96f992d8623af45593d4b472efec65b5e54bf4'] // RetteDeineFreiheit.de_HD_high.mp4.torrent
@@ -211,13 +212,15 @@ function app(app) {
         someContent += Html.tag('input',{'type':'submit'});
         someContent = Html.tag( 'form', { 'action':'/up',
                                           'method':'post',
+                                          'enctype':'multipart/form-data',
                                           'class':'uploadform'},
                                        someContent);
+        var helpUsMsg = 'Help us win Node.js KO!';
         var img = Html.tag( 'img', { 'src':'http://nodeknockout.com/images/voteko.png',
-                                      'alt':'Help us win Node.js KO!'});
+                                      'alt':helpUsMsg});
         someContent += Html.tag( 'a', { 'href':'http://nodeknockout.com/teams/chaosscript',
                                         'target':'nko',
-                                        'title':'Help us win Node.js KO!',
+                                        'title':helpUsMsg,
                                         'class':'pleasevote' },
                                      img);
         var torrents = '';
