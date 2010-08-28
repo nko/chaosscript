@@ -65,6 +65,38 @@ module.exports = {
         fileList
 
         return result;
+    },
+
+    getRecommendations: function(cb) {
+        function walkRecommendations(infoHexes, results, cb) {
+            if (infoHexes.length < 1)
+                cb(null, results);
+            else {
+                var infoHex = infoHexes.shift();
+                module.exports.getFileinfo(infoHex, function(error, fileinfo) {
+                                               if (fileinfo)
+                                                   results.push({ infoHex: infoHex,
+                                                                  name: fileinfo.name || 'Torrent file'
+                                                                });
+                                               walkRecommendations(infoHexes, results, cb);
+                                           });
+            }
+        }
+
+        redis.get("recommendations", function(error, data) {
+                      var infoHexes;
+                      try {
+                          infoHexes = JSON.parse(data.toString());
+                      } catch (e) {
+                          error = e.message;
+                      }
+                      if (error)
+                          cb(error);
+                      else if (infoHexes && infoHexes.shift) {
+                          walkRecommendations(infoHexes, [], cb);
+                      } else
+                          cb(null, []);
+                  });
     }
 };
 

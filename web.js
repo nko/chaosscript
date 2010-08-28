@@ -5,13 +5,25 @@ var Model = require('./model');
 var TorrentManager = require('./torrent_manager');
 var Html = require('./html');
 
-Html.setTemplate('./public/template.htm');
-var legalTorrents = {'Rette Deine Freiheit':'0f96f992d8623af45593d4b472efec65b5e54bf4', // RetteDeineFreiheit.de_HD_high.mp4.torrent
-                     'Yes Men':'51951b8d09770e3e5b8c8e0a2dc6eb3d96f52bd7'} // yes men ( http://vodo.net/ )
-
 process.on('uncaughtException', function(e) {
            console.log(e.stack ? e.stack : e.toString());
        });
+
+Html.setTemplate('./public/template.htm');
+
+
+/* Recommendations updater */
+var recommendations = [];
+function updateRecommendations() {
+    Model.getRecommendations(function(error, r) {
+				 if (r)
+				     recommendations = r;
+				 else
+				     console.log("Cannot get recommendations: " + error);
+			     });
+}
+setInterval(updateRecommendations, 10 * 1000);
+updateRecommendations();
 
 /*
 function hexChar(v) {
@@ -203,8 +215,9 @@ function app(app) {
             });
     app.get('/', function(req, res) {
         var torrentItemString = '';
-        for (var title in legalTorrents)
-            torrentItemString += Html.tag('li',[], Html.tag('a', {href:'/'+legalTorrents[title]+'.html'},title));
+        recommendations.forEach(function(r) {
+	    torrentItemString += Html.tag('li',[], Html.tag('a', {href:'/'+r.infoHex+'.html'},r.name));
+	});
         res.writeHead(200, {});
         res.write(Html.index( torrentItemString ));
         res.end();
