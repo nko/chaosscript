@@ -6,7 +6,8 @@ var TorrentManager = require('./torrent_manager');
 var Html = require('./html');
 
 Html.setTemplate('./public/template.htm');
-var legalTorrents = ['0f96f992d8623af45593d4b472efec65b5e54bf4'] // RetteDeineFreiheit.de_HD_high.mp4.torrent
+var legalTorrents = {'Rette Deine Freiheit':'0f96f992d8623af45593d4b472efec65b5e54bf4', // RetteDeineFreiheit.de_HD_high.mp4.torrent
+                     'Yes Men':'51951b8d09770e3e5b8c8e0a2dc6eb3d96f52bd7'} // yes men ( http://vodo.net/ )
 
 process.on('uncaughtException', function(e) {
            console.log(e.stack ? e.stack : e.toString());
@@ -134,7 +135,7 @@ function streamer(req, res, next) {
                                       var m;
                                       if (req.headers.range &&
                                           (m = req.headers.range.match(/bytes=(\d+)/))) {
-                                          
+
                                           var start = parseInt(m[1], 10);
                                           offset += start;
                                           var fullLength = length;
@@ -146,7 +147,7 @@ function streamer(req, res, next) {
 
                                       var stream = ctx.stream(file.offset, file.length);
                                       req.socket.on('end', function() {
-                                                        stream.end();        
+                                                        stream.end();
                                                     });
                                       req.socket.on('error', function() {
                                                         stream.end();
@@ -201,18 +202,14 @@ function app(app) {
 			     });
             });
     app.get('/', function(req, res) {
-        console.log('Im in the index-action!');
         var torrentItemString = '';
-        legalTorrents.forEach(function(t){
-            torrentItemString += Html.tag('li',[], Html.tag('a', {'href':'/'+t+'.html'},'Some Torrent'));
-        });
+        for (var title in legalTorrents)
+            torrentItemString += Html.tag('li',[], Html.tag('a', {href:'/'+legalTorrents[title]+'.html'},title));
         res.writeHead(200, {});
-        console.log('just before index output');
         res.write(Html.index( torrentItemString ));
         res.end();
     });
     app.get('/:infoHex.html', function(req, res) {
-        console.log('Im in the show-action!');
         Model.getFileinfo(req.params.infoHex, function(error, fileinfo) {
                               if (error === 'Not found') {
                                   res.writeHead(404, {});
