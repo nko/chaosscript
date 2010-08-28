@@ -178,7 +178,8 @@ function app(app) {
         var someContent = Html.tag( 'input', { 'name':'torrentfile',
                                                'type':'file',
                                                'class': 'fileinput'});
-        someContent = Html.tag( 'form', { 'action':'/upload',
+        someContent += Html.tag('input',{'type':'submit'});
+        someContent = Html.tag( 'form', { 'action':'/up',
                                           'method':'post',
                                           'class':'uploadform'},
                                        someContent);
