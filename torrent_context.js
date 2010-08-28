@@ -101,11 +101,12 @@ TorrentContext.prototype.onActivity = function() {
     this.workStreams();
 
     if (this.infoWaiters) {
-	info = { peers: {} };
+	info = { peers: { total: 0 } };
 	this.peers.forEach(function(peer) {
 			       if (!info.peers.hasOwnProperty(peer.state))
 				   info.peers[peer.state] = 0;
 			       info.peers[peer.state]++;
+			       info.peers.total++;
 			   });
 	this.infoWaiters.forEach(function(cb) {
 				     cb(info);

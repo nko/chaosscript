@@ -35,4 +35,25 @@ $(document).ready(function() {
      }
      $(this).toggleClass('active');
     });
+
+    var m;
+    if ((m = document.location.pathname.match(/\/([0-9a-f]{40})\./)))
+	pollInfo(m[1]);
 });
+
+function pollInfo(infoHex) {
+    $.ajax({ url: '/' + infoHex + '.json',
+	     dataType: 'json',
+	     success: function(info) {
+		 $('.metainfos').text(info.peers.connected + '/' +
+				      info.peers.total + ' peers connected');
+
+		 pollInfo(infoHex);
+	     },
+	     error: function() {
+		 setTimeout(function() {
+				pollInfo(infoHex);
+			    }, 1000);
+	     }
+	   });
+}
