@@ -176,7 +176,7 @@ function app(app) {
 
 
     app.get('/:infoHex.json', function(req, res) {
-        var infoHex = req.params.path.infoHex;
+        var infoHex = req.params.infoHex;
         var ctx = TorrentManager.get(infoHex);
 
         var response = {
@@ -196,6 +196,7 @@ function app(app) {
         res.end();
     });
     app.get('/:infoHex.html', function(req, res) {
+        console.log('Im in the show-action!');
         Model.getFileinfo(req.params.infoHex, function(error, fileinfo) {
             if (error === 'Not found') {
             res.writeHead(404, {});
@@ -205,7 +206,7 @@ function app(app) {
             fileinfo.files.forEach(
                 function(file) {
                     console.log(file.name.toString());
-                    var fLink = Html.tag('a',{'href':'#'},file.name.toString());
+                    var fLink = Html.tag('a',{'href':'#'},file.name+'');
                     filelist += Html.tag('li',{'class':'file'}, fLink);
                     });
             res.writeHead(200, {});
