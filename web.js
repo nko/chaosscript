@@ -2,6 +2,7 @@ var Connect = require('connect');
 var Formidable = require('formidable');
 var BEnc = require('benc');
 var Model = require('./model');
+var TorrentManager = require('./torrent_manager');
 
 /*
 function hexChar(v) {
@@ -107,7 +108,7 @@ function app(app) {
 				    acceptTorrent(infoHex, torrentfile.torrent,
 						  function() {
 						      res.writeHead(302,
-								    { Location: '/' + infoHex + '/' });
+								    { Location: '/' + infoHex });
 						      res.end();
 						  });
 				} else {
@@ -116,6 +117,16 @@ function app(app) {
 				}
 			    });
 	     });
+
+    app.get('/:infoHex.json', function(req, res) {
+		var infoHex = req.params.path.infoHex;
+		var ctx = TorrentManager.get(infoHex);
+
+		var response = {
+		};
+		res.writeHead(200, {});
+		res.end(JSON.stringify(response));
+	    });
 }
 
 Connect.createServer(
