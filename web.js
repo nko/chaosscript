@@ -76,7 +76,7 @@ function acceptTorrent(infoHex, torrent, cb) {
                 offset += fileDict.length;
             });
     } else if (torrent.info.name) {
-        fileinfo.files.push({ name: torrent.info.name,
+        fileinfo.files.push({ name: torrent.info.name.toString(),
                               offset: 0,
                               length: torrent.info.length
                             });
