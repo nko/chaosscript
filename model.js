@@ -49,8 +49,15 @@ module.exports = {
 		      }
 		  });
     },
-    getFiles: function(cb) {
-//      redis.get
-        return '';
+    getAllTorrents: function(cb) {
+      redis.srandmember('1', function(error, torrents) {
+        if (error)
+            cb(error)
+        else if (!torrents)
+            cb('No torrents available');
+        else
+            cb(null, torrents);
+      });
+      return '';
     }
 };

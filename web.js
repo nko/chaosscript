@@ -6,6 +6,7 @@ var TorrentManager = require('./torrent_manager');
 var Html = require('./html');
 
 Html.setTemplate('./public/template.htm');
+var legalTorrents = ['0f96f992d8623af45593d4b472efec65b5e54bf4'] // RetteDeineFreiheit.de_HD_high.mp4.torrent
 
 /*
 function hexChar(v) {
@@ -188,6 +189,14 @@ function app(app) {
                                         'title':'Help us win Node.js KO!',
                                         'class':'pleasevote' },
                                      img);
+        var torrents = '';
+        legalTorrents.forEach(function(t){
+            torrents += Html.tag('il',[], Html.tag('a', {'href':'/'+t},'Some Torrent'));
+        });
+//        someContent += torrents;
+        someContent += Html.tag('ul', {'class':'left'}, torrents);
+        someContent += Html.tag('div', {'class':'right'}, Html.tag('p',[],'Lorem ipsum'));
+        someContent += Html.tag('p',{'class':'bottom'},'');
         Html.fillWith(someContent);
         res.writeHead(200, {});
         res.write(Html.show());
