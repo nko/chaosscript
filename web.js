@@ -107,45 +107,61 @@ function acceptTorrent(infoHex, torrent, cb) {
 function streamer(req, res, next) {
     var m;
     if (req.method == 'GET' &&
-    (m = req.url.match(/^\/([0-9a-f]{40})\/(.+)/))) {
+        (m = req.url.match(/^\/([0-9a-f]{40})\/(.+)/))) {
 
-    var infoHex = m[1];
-    var filename = m[2];
+        var infoHex = m[1];
+        var filename = m[2];
 
-    Model.getFileinfo(infoHex, function(error, fileinfo) {
-                  if (error === 'Not found') {
-                  res.writeHead(404, {});
-                  res.end('Not found');
-                  } else if (fileinfo) {
-                  var file;
-                  fileinfo.files.forEach(function(file1) {
-                                 if (file1.name === filename)
-                                 file = file1;
-                             });
-                  if (!file) {
-                      res.writeHead(404, {});
-                      res.end('Not found');
-                  } else {
-                      var ctx = TorrentManager.get(infoHex);
-                      var stream = ctx.stream(file.offset, file.length);
-                      req.socket.on('end', function() {
-                            stream.end();
-                            });
-                      req.socket.on('error', function() {
-                            stream.end();
-                            });
-                      stream.on('data', function(data) {
-                            res.write(data);
-                        });
-                      stream.on('end', function() {
-                            res.end();
-                        });
-                      res.writeHead(200, {'Content-Type': 'binary/octet-stream'});
-                  }
-                  } else
-                  throw error;
-              });
+        Model.getFileinfo(infoHex, function(error, fileinfo) {
+                              if (error === 'Not found') {
+                                  res.writeHead(404, {});
+                                  res.end('Not found');
+                              } else if (fileinfo) {
+                                  var file;
+                                  fileinfo.files.forEach(function(file1) {
+                                                             if (file1.name === filename)
+                                                                 file = file1;
+                                                         });
+                                  if (!file) {
+                                      res.writeHead(404, {});
+                                      res.end('Not found');
+                                  } else {
+                                      var ctx = TorrentManager.get(infoHex);
+                                      var resHeaders = {'Content-Type': 'binary/octet-stream',
+                                                        'Accept-Ranges': 'bytes'};
+                                      var offset = file.offset;
+                                      var length = file.length;
+                                      var m;
+                                      if (req.headers.range &&
+                                          (m = req.headers.range.match(/bytes=(\d+)/))) {
+                                          
+                                          var start = parseInt(m[1], 10);
+                                          offset += start;
+                                          var fullLength = length;
+                                          length -= start;
+                                          resHeaders['Content-Range'] = 'bytes ' + start +
+                                              '-' + (start + length) + '/' + fullLength;
+                                      }
+                                      resHeaders['Content-Length'] = length;
 
+                                      var stream = ctx.stream(file.offset, file.length);
+                                      req.socket.on('end', function() {
+                                                        stream.end();        
+                                                    });
+                                      req.socket.on('error', function() {
+                                                        stream.end();
+                                                    });
+                                      stream.on('data', function(data) {
+                                                    res.write(data);
+                                                });
+                                      stream.on('end', function() {
+                                                    res.end();
+                                                });
+                                      res.writeHead(resHeaders['Content-Range'] ? 206 : 200, resHeaders);
+                                  }
+                              } else
+                                  throw error;
+                          });
     } else {
         next();
     }
