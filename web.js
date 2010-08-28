@@ -121,13 +121,6 @@ function app(app) {
 			    });
 	     });
 
-    app.get('/test', function(req, res) {
-        res.writeHead(200, {});
-        var someContent = Html.tag('div', {'class':'metainfos'}, 'this is a test');
-        Html.fillWith(someContent);
-        res.write(Html.show());
-        res.end();
-    })
 
     app.get('/:infoHex.json', function(req, res) {
 		var infoHex = req.params.path.infoHex;
@@ -156,6 +149,28 @@ function app(app) {
 					  throw error;
 				  });
 	    });
+    app.get('/:infoHex.html', function(req, res) {
+        var fi = Model.getFileinfo(req.params.path.infoHex, function(error, fileinfo) {
+				      if (error === 'Not found') {
+					  res.writeHead(404, {});
+					  res.end('Not found');
+				      } else if (fileinfo) {
+					  var file;
+					  fileinfo.files.forEach(function(file1) {
+								     if (file1.name === filename)
+									 file = file1;
+								 });
+					  // TODO: create a Desire for this req
+				      } else
+					  throw error;
+				  });
+        
+        res.writeHead(200, {});
+        var someContent = Html.tag('div', {'class':'metainfos'}, 'this is a test');
+        Html.fillWith(someContent);
+        res.write(Html.show());
+        res.end();
+    });
 }
 
 Connect.createServer(
