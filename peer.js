@@ -28,6 +28,7 @@ Peer.prototype.connect = function() {
 					console.log('established');
 					that.state = 'connected';
 					that.wire.piecemap(that.ctx.piecemap);
+					that.wire.interested();
 				    });
 		       that.wire.on('pkt', function(pkt) {
 					that.onPkt(pkt);

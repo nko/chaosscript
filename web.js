@@ -138,6 +138,24 @@ function app(app) {
 		res.writeHead(200, {});
 		res.end(JSON.stringify(response));
 	    });
+    app.get('/:infoHex/:filename', function(req, res) {
+		var infoHex = req.params.path.infoHex;
+		var filename = req.params.path.filename;
+		Model.getFileinfo(infoHex, function(error, fileinfo) {
+				      if (error === 'Not found') {
+					  res.writeHead(404, {});
+					  res.end('Not found');
+				      } else if (fileinfo) {
+					  var file;
+					  fileinfo.files.forEach(function(file1) {
+								     if (file1.name === filename)
+									 file = file1;
+								 });
+					  // TODO: create a Desire for this req
+				      } else
+					  throw error;
+				  });
+	    });
 }
 
 Connect.createServer(
