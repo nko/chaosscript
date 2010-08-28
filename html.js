@@ -10,7 +10,7 @@ module.exports = {
       return template;
     },
     tag: function( tagName, opts, content ) {
-        if (typeof(opts)=='undefined')
+        if (typeof(content)=='undefined')
             return '<'+tagName+' '+this.optsToStr(opts)+' />';
         else
             return '<'+tagName+' '+this.optsToStr(opts)+'>'+content+'</'+tagName+'>';
@@ -19,7 +19,7 @@ module.exports = {
         var result = '';
         if (!(typeof(opts)=='undefined'))
             for (var key in opts)
-                result = result + ' ' + key + '="'+ opts +'"';
+                result += ' ' + key + '="'+ opts[key] +'"';
         return result;
     },
     fillWith: function( content, placeholder ) {

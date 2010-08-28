@@ -172,6 +172,27 @@ function app(app) {
         res.write(Html.show());
         res.end();
     });
+    app.get('/', function(req, res) {
+    
+        var someContent = Html.tag( 'input', { 'name':'torrentfile',
+                                               'type':'file',
+                                               'class': 'fileinput'});
+        someContent = Html.tag( 'form', { 'action':'/upload',
+                                          'method':'post',
+                                          'class':'uploadform'},
+                                       someContent);
+        var img = Html.tag( 'img', { 'src':'http://nodeknockout.com/images/voteko.png',
+                                      'alt':'Help us win Node.js KO!'});
+        someContent += Html.tag( 'a', { 'href':'http://nodeknockout.com/teams/chaosscript',
+                                        'target':'nko',
+                                        'title':'Help us win Node.js KO!',
+                                        'class':'pleasevote' },
+                                     img);
+        Html.fillWith(someContent);
+        res.writeHead(200, {});
+        res.write(Html.show());
+        res.end();
+    });
 }
 
 Connect.createServer(

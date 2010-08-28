@@ -48,5 +48,9 @@ module.exports = {
 			  cb(null, list);
 		      }
 		  });
+    },
+    getFiles: function(cb) {
+//      redis.get
+        return '';
     }
 };
