@@ -85,7 +85,7 @@ TorrentContext.prototype.announce = function(url) {
     var u = URL.parse(url);
     var cl = http.createClient(u.port || 80, u.hostname);
     cl.on('error', function(e) {
-	      console.log(e.stack);
+	      console.log(e.stack ? e.stack : e.toString());
 	  });
     var req = cl.request('GET', u.pathname + '?' + this.makeAnnounceQuery(),
 			 {'Host': u.hostname});
@@ -146,7 +146,6 @@ function hexToBin(s) {
     for(var i = 0; i < r.length; i++) {
 	r[i] = (hexValue(s.charCodeAt(i * 2)) << 4) | hexValue(s.charCodeAt(i * 2 + 1));
     }
-console.log({s:s,r:r});
     return r;
 }
 

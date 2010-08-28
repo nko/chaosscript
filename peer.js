@@ -1,5 +1,6 @@
 var net = require('net');
 var WP = require('wire_protocol');
+var PieceMap = require('piecemap');
 
 function Peer(ctx, host, port) {
     this.ctx = ctx;
@@ -40,12 +41,25 @@ Peer.prototype.connect = function() {
 		   });
     this.socket.on('error', function() {
 		       delete that.socket;
+		       delete that.wire;
+		       that.state = 'bad';
+		   });
+    this.socket.on('end', function() {
+		       delete that.socket;
+		       delete that.wire;
 		       that.state = 'bad';
 		   });
 };
 
 Peer.prototype.onPkt = function(pkt) {
-    console.log('pkt');
+    var that = this;
+    pkt.on('bitfield', function(piecemap) {
+	       that.piecemap = new PieceMap(piecemap);
+	       console.log({piecemap:piecemap});
+	   });
+    pkt.on('have', function(index) {
+	       that.piecemap.have(index);
+	   });
 };
 
 module.exports = Peer;
