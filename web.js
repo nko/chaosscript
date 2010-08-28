@@ -182,24 +182,24 @@ function app(app) {
 		res.writeHead(200, {});
 		res.end(JSON.stringify(response));
 	    });
-    app.get('/:infoHex.html', function(req, res) {
-        var fi = Model.getFileinfo(req.params.path.infoHex, function(error, fileinfo) {
-				      if (error === 'Not found') {
-					  res.writeHead(404, {});
-					  res.end('Not found');
-				      } else if (fileinfo) {
-					  var file;
-					  fileinfo.files.forEach(function(file1) {
-								     if (file1.name === filename)
-									 file = file1;
-								 });
-					  // TODO: create a Desire for this req
-				      } else
-					  throw error;
-				  });
-        
-        res.writeHead(200, {});
+    app.get('/:infoHex', function(req, res) {
+		var filelist = ''
+        Model.getFileinfo(req.params.infoHex, function(error, fileinfo) {
+		    if (error === 'Not found') {
+			    res.writeHead(404, {});
+			    res.end('Not found');
+		    } else if (fileinfo) {
+			    fileinfo.files.forEach(function(f) {
+    			    var fLink = Html.tag('a',{'href':'#'},f.name+'');
+	    		    filelist += Html.tag('li',{'class':'file'}, fLink);
+    		    });
+		    } else
+				  throw error;
+		});
         var someContent = Html.tag('div', {'class':'metainfos'}, 'this is a test');
+        someContent += Html.tag('ul', {'class':'filetree'}, filelist);
+        someContent += Html.tag('p',{'class':'bottom'},'');
+        res.writeHead(200, {});
         Html.fillWith(someContent);
         res.write(Html.show());
         res.end();
