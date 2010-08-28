@@ -99,7 +99,26 @@ TorrentContext.prototype.workStreams = function() {
 TorrentContext.prototype.onActivity = function() {
     this.lastActivity = Date.now();
     this.workStreams();
+
+    if (this.infoWaiters) {
+	info = { peers: {} };
+	this.peers.forEach(function(peer) {
+			       if (!info.peers.hasOwnProperty(peer.state))
+				   info.peers[peer.state] = 0;
+			       info.peers[peer.state]++;
+			   });
+	this.infoWaiters.forEach(function(cb) {
+				     cb(info);
+				 });
+	delete this.infoWaiters;
+    }
 };
+
+TorrentContext.prototype.waitInfo = function(cb) {
+    if (this.infoWaiters === undefined)
+	this.infoWaiters = [];
+    this.infoWaiters.push(cb);
+}
 
 TorrentContext.prototype.receivePiece = function(index, begin, data) {
     var that = this;

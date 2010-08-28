@@ -195,10 +195,10 @@ function app(app) {
                 var infoHex = req.params.infoHex;
                 var ctx = TorrentManager.get(infoHex);
 
-                var response = {
-                };
-                res.writeHead(200, {});
-                res.end(JSON.stringify(response));
+		ctx.waitInfo(function(info) {
+				 res.writeHead(200, {});
+				 res.end(JSON.stringify(info));
+			     });
             });
     app.get('/', function(req, res) {
         console.log('Im in the index-action!');
