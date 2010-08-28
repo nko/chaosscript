@@ -47,9 +47,10 @@ Peer.prototype.connect = function() {
 		       this.choked = true;
 		   });
     this.socket.on('end', function() {
+		       console.log("Disconnected from peer "+that.host+":"+that.port);
 		       delete that.socket;
 		       delete that.wire;
-		       that.state = 'bad';
+		       that.state = that.state == 'connected' ? 'closed' : 'bad';
 		       this.choked = true;
 		   });
 };
@@ -60,18 +61,22 @@ Peer.prototype.onPkt = function(pkt) {
     pkt.on('unchoke', function() {
 	       that.choked = false;
 	       console.log(that.host+':'+that.port+" unchoked, ready=" + that.isReady());
-	       that.ctx.onActivity();
+	       that.onActivity();
 	   });
     pkt.on('choke', function() {
 	       that.choked = true;
+	       console.log(that.host+':'+that.port+" choked");
 	   });
     pkt.on('bitfield', function(piecemap) {
 	       that.piecemap = new PieceMap(piecemap);
-	       that.ctx.onActivity();
+	       that.onActivity();
 	   });
     pkt.on('have', function(index) {
-	       that.piecemap.have(index);
-	       that.ctx.onActivity();
+	       if (!that.piecemap && that.ctx.pieceNum)
+		   that.piecemap = new PieceMap(that.ctx.pieceNum);
+	       if (that.piecemap)
+		   that.piecemap.have(index);
+	       that.onActivity();
 	   });
 
     pkt.on('piece', function(index, begin, data) {
@@ -79,16 +84,28 @@ Peer.prototype.onPkt = function(pkt) {
 	   });
     pkt.on('pieceEnd', function() {
 	       that.queue--;
-	       that.ctx.onActivity();
+	       that.onActivity();
 	   });
+};
+
+Peer.prototype.onActivity = function() {
+    if (!this.choked)
+	this.ctx.onActivity();
+
 };
 
 Peer.prototype.isReady = function() {
 //console.log({ready:{state:this.state,choked:this.choked,queue:this.queue}});
     return this.state === 'connected' &&
 	!this.choked &&
-	this.queue < 4;
+	this.queue < 1;  // TODO: increase
 };
+
+Peer.prototype.canConnect = function() {
+    return !this.socket &&
+	(this.state === 'unknown' ||
+	 this.state === 'closed');
+}
 
 Peer.prototype.hasPiece = function(index) {
     return this.piecemap ? this.piecemap.has(index) : false;

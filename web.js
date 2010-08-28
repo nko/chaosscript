@@ -132,6 +132,9 @@ function streamer(req, res, next) {
 				      req.socket.on('end', function() {
 							stream.end();	
 						    });
+				      req.socket.on('error', function() {
+							stream.end();
+						    });
 				      stream.on('data', function(data) {
 						    res.write(data);
 						});

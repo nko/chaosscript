@@ -8,7 +8,7 @@ var Peer = require('./peer');
 var PieceMap = require('piecemap');
 
 // what we request:
-var CHUNK_SIZE = 8 * 1024;
+var CHUNK_SIZE = 32 * 1024;
 
 var TorrentContext = module.exports = function(tm, infoHex) {
     var that = this;
@@ -23,6 +23,7 @@ var TorrentContext = module.exports = function(tm, infoHex) {
     this.peers = {};
     this.size = 0;
     this.streams = [];
+    this.lastActivity = Date.now();
     Model.getFileinfo(infoHex, function(error, fileinfo) {
 			  if (error)
 			      throw error;
@@ -31,22 +32,56 @@ var TorrentContext = module.exports = function(tm, infoHex) {
 			  fileinfo.files.forEach(function(file) {
 						     that.size += file.length;
 						 });
-			  var pieceNum = Math.ceil(that.size / fileinfo.pieceLength);
-			  that.piecemap = new PieceMap(pieceNum);
+			  that.pieceNum = Math.ceil(that.size / fileinfo.pieceLength);
+			  that.piecemap = new PieceMap(that.pieceNum);
 		      });
 
     this.tryAnnounce();
     setInterval(function() {
-		    that.tryAnnounce();
+		    if (that.streams.length > 0) {
+			// Force a tracker request after 10s idleness,
+			// don't bore our visitors.
+			// This really puts load on the trackers if many
+			// people were doing this. Luckily they don't.
+			var force = that.lastActivity && (that.lastActivity < Date.now() - 10 * 1000);
+			that.tryAnnounce(force);
+		    }
 		}, 2000);
 };
 
 TorrentContext.prototype.addPeer = function(host, port) {
     if (!this.peers.hasOwnProperty(host)) {
 	var peer = this.peers[host] = new Peer(this, host, port);
-	console.log({host:host,port:port});
-	peer.connect();
+	this.canWorkPeers();
     }
+};
+
+TorrentContext.prototype.canWorkPeers = function() {
+    var that = this;
+
+    if (!this.workPeersScheduled) {
+	setTimeout(function() {
+		       that.workPeersScheduled = false;
+		       that.workPeers();
+		   }, 50);
+	this.workPeersScheduled = true;      
+    }
+};
+
+TorrentContext.prototype.workPeers = function() {
+    var didSomething = false;
+    for(var host in this.peers) {
+	if (this.peers.hasOwnProperty(host)) {
+	    if (this.peers[host].canConnect()) {
+		this.peers[host].connect();
+		didSomething = true;
+		break;
+	    }
+	}
+    }
+
+    if (didSomething)
+	this.canWorkPeers();
 };
 
 TorrentContext.prototype.workStreams = function() {
@@ -62,7 +97,11 @@ console.log({requestPiece: peer});
 			     }
 			 });
 };
-TorrentContext.prototype.onActivity = TorrentContext.prototype.workStreams;
+TorrentContext.prototype.onActivity = function() {
+console.log('activity');
+    this.lastActivity = Date.now();
+    this.workStreams();
+};
 
 TorrentContext.prototype.receivePiece = function(index, begin, data) {
     var that = this;
@@ -113,6 +152,9 @@ TorrentContext.prototype.stream = function(offset, length) {
 	this.emit('end');
     };
     this.streams.push(stream);
+
+    this.workStreams();
+
     return stream;
 };
 
@@ -133,7 +175,7 @@ TorrentContext.prototype.refreshTrackers = function(cb) {
 };
 
 // Called periodically by ctor
-TorrentContext.prototype.tryAnnounce = function() {
+TorrentContext.prototype.tryAnnounce = function(force) {
     var that = this;
     this.refreshTrackers(function(error) {
 			     if (error)
@@ -142,7 +184,7 @@ TorrentContext.prototype.tryAnnounce = function() {
 			     var now = Date.now();
 			     for(var url in that.trackers)
 				 if (that.trackers.hasOwnProperty(url) &&
-				     that.trackers[url].next <= now) {
+				     (that.trackers[url].next <= now || force)) {
 			
 				     that.announce(url);
 				     break;  // only one
@@ -185,6 +227,8 @@ TorrentContext.prototype.announce = function(url) {
 		   res.socket.end();
 	       }
 	   });
+
+    this.lastActivity = Date.now();
 };
 
 TorrentContext.prototype.makeAnnounceQuery = function() {
@@ -244,5 +288,5 @@ function parsePeers(data) {
 }
 
 function generatePeerId() {
-	return new Buffer("-BS00-YOYOYOYOYOYOYO");
+	return new Buffer("-BS00-YOYOYOYOYOYOY0");
 }
