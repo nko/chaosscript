@@ -42,12 +42,29 @@ module.exports = {
                       if (error)
                           cb(error);
                       else if (!data)
-                      cb('Not found');
+                          cb('Not found');
                       else {
                           var list = JSON.parse(data.toString());
                           cb(null, list);
                       }
                   });
+
+    parseTreeByFiles: function( fileList ) {
+        var result = {};
+        fileList.forEach(function(f) {
+//            root = (new Buffer(f.name)).join('').split('/')[0];
+            root = f.name.split('/')[0];
+            result[root] = (result[root] || {});
+            if (f.name.indexOf('/' != -1)) { // Directory
+                result[root]['type'] = 'directory';
+                result[root]['files'] = (result[root]['files'] || {});
+            } else { // File
+                result[root]['type'] = ['file'];
+            }
+          });
+        fileList
+
+        return result;
     }
 };
 

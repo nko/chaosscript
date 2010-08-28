@@ -215,15 +215,10 @@ function app(app) {
                                   res.writeHead(404, {});
                                   res.end('Not found');
                               } else if (fileinfo) {
-                                  var filelist = '';
-                                  fileinfo.files.forEach(
-                                      function(file) {
-                                          var fLink = Html.tag('a',{'href':'#'},file.name+'');
-                                          filelist += Html.tag('li',{'class':'file'}, fLink);
-                                      });
+                                  var files = Model.parseTreeByFiles(fileinfo.files);
+                                  console.log(files);
                                   res.writeHead(200, {});
-                                  console.log('just before show output');
-                                  res.write(Html.show(filelist));
+                                  res.write(Html.show(files));
                                   res.end();
                               } else
                                   throw error;

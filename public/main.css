@@ -16,6 +16,10 @@ h1 {
   color:#3B434D;
 }
 
+a img {
+  border:none;
+}
+
 .head {
   width:99%;
   vertical-align:middle;
@@ -154,3 +158,4 @@ li.closed-dir ul {
   width:560px; /* 560 + Rahmen */
   background-image:url(img/tv.png);
 }
+

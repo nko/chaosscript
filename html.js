@@ -6,9 +6,10 @@ module.exports = {
             template = data;
         });
     },
-    show: function( filelist ) {
+    show: function( files ) {
         var M = module.exports;
         var someContent = M.tag('div', {'class':'metainfos'}, 'Stringing the swarm...');
+        var filelist = M.generateFilelist( files );
         someContent += M.tag('ul', {'class':'filetree'}, filelist);
         someContent += M.tag('p',{'class':'bottom'},'');
         return M.fillWith( someContent );
@@ -58,6 +59,18 @@ module.exports = {
         if (typeof(placeholder)=='undefined')
             var placeholder = '%CONTENT%';
         return (template+'').replace( placeholder, content );
+    },
+    generateFilelist: function( files ) {
+        var M = module.exports;
+        filelist = ''
+        for (var filename in files) {
+            var file = files[filename];
+            var fLink = M.tag('a',{'href':'#'},filename+'');
+            var cssClass = ((file['type'] == 'file') ? 'file' : 'opened-dir');
+            filelist += M.tag('li',{'class':'file'}, fLink);
+        }
+        return filelist;
     }
+
 };
 
