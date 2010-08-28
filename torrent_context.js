@@ -2,9 +2,13 @@ var Model = require('./model');
 var BEnc = require('benc');
 var URL = require('url');
 var http = require('http');
+var EventEmitter = require('events').EventEmitter;
 var TM = require('./torrent_manager');
 var Peer = require('./peer');
 var PieceMap = require('piecemap');
+
+// what we request:
+var CHUNK_SIZE = 8 * 1024;
 
 var TorrentContext = module.exports = function(tm, infoHex) {
     var that = this;
@@ -18,10 +22,12 @@ var TorrentContext = module.exports = function(tm, infoHex) {
     this.bytesLeft = 1024 * 1024 * 1024;
     this.peers = {};
     this.size = 0;
+    this.streams = [];
     Model.getFileinfo(infoHex, function(error, fileinfo) {
 			  if (error)
 			      throw error;
 
+			  that.pieceLength = fileinfo.pieceLength;
 			  fileinfo.files.forEach(function(file) {
 						     that.size += file.length;
 						 });
@@ -41,6 +47,73 @@ TorrentContext.prototype.addPeer = function(host, port) {
 	console.log({host:host,port:port});
 	peer.connect();
     }
+};
+
+TorrentContext.prototype.workStreams = function() {
+    var that = this;
+
+    this.streams.forEach(function(stream) {
+			     var index = Math.floor(stream.offset / that.pieceLength);
+			     var peer = that.getPieceCandidate(index);
+			     if (peer) {
+				 var offset = stream.offset % that.pieceLength;
+console.log({requestPiece: peer});
+				 peer.requestPiece(index, offset, CHUNK_SIZE);
+			     }
+			 });
+};
+TorrentContext.prototype.onActivity = TorrentContext.prototype.workStreams;
+
+TorrentContext.prototype.receivePiece = function(index, begin, data) {
+    var that = this;
+
+    var offset = this.pieceLength * index + begin;
+    this.streams.forEach(function(stream) {
+			     if (stream.offset >= offset && stream.offset <= offset + data.length) {
+				 stream.write(data.slice(stream.offset - stream.offset,
+							 stream.length < data.length ? stream.length : data.length));
+			     }
+		       });
+};
+
+TorrentContext.prototype.getPieceCandidate = function(index) {
+    var candidate;
+    for(var host in this.peers) {
+	if (this.peers.hasOwnProperty(host) && this.peers[host].isReady()) {
+	    console.log({candidate:{host:host, ready:this.peers[host].isReady(),has:this.peers[host].hasPiece(index)}});
+	    if (this.peers[host].isReady() &&
+		this.peers[host].hasPiece(index)) {
+
+		// TODO: scoring :-)
+		candidate = this.peers[host];
+		break;
+	    }
+	}
+    }
+    if (candidate)
+	console.log({piece:index,candidate:candidate});
+    return candidate;
+};
+
+TorrentContext.prototype.stream = function(offset, length) {
+    var that = this;
+
+    var stream = new EventEmitter();
+    stream.offset = offset;
+    stream.length = length;
+    stream.write = function(data) {
+	this.emit('data', data);
+	stream.offset += data.length;
+	stream.length -= data.length;
+	if (stream.length <= 0)
+	    this.end();
+    };
+    stream.end = function() {
+	that.streams.splice(that.streams.indexOf(stream), 1);
+	this.emit('end');
+    };
+    this.streams.push(stream);
+    return stream;
 };
 
 TorrentContext.prototype.refreshTrackers = function(cb) {

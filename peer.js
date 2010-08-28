@@ -8,6 +8,7 @@ function Peer(ctx, host, port) {
     this.host = host;
     this.port = port;
 
+    this.queue = 0;
     this.choked = true;
 }
 
@@ -43,23 +44,59 @@ Peer.prototype.connect = function() {
 		       delete that.socket;
 		       delete that.wire;
 		       that.state = 'bad';
+		       this.choked = true;
 		   });
     this.socket.on('end', function() {
 		       delete that.socket;
 		       delete that.wire;
 		       that.state = 'bad';
+		       this.choked = true;
 		   });
 };
 
 Peer.prototype.onPkt = function(pkt) {
     var that = this;
+
+    pkt.on('unchoke', function() {
+	       that.choked = false;
+	       console.log(that.host+':'+that.port+" unchoked, ready=" + that.isReady());
+	       that.ctx.onActivity();
+	   });
+    pkt.on('choke', function() {
+	       that.choked = true;
+	   });
     pkt.on('bitfield', function(piecemap) {
 	       that.piecemap = new PieceMap(piecemap);
-	       console.log({piecemap:piecemap});
+	       that.ctx.onActivity();
 	   });
     pkt.on('have', function(index) {
 	       that.piecemap.have(index);
+	       that.ctx.onActivity();
 	   });
+
+    pkt.on('piece', function(index, begin, data) {
+	       that.ctx.receivePiece(index, begin, data);
+	   });
+    pkt.on('pieceEnd', function() {
+	       that.queue--;
+	       that.ctx.onActivity();
+	   });
+};
+
+Peer.prototype.isReady = function() {
+//console.log({ready:{state:this.state,choked:this.choked,queue:this.queue}});
+    return this.state === 'connected' &&
+	!this.choked &&
+	this.queue < 4;
+};
+
+Peer.prototype.hasPiece = function(index) {
+    return this.piecemap ? this.piecemap.has(index) : false;
+};
+
+Peer.prototype.requestPiece = function(index, begin, length) {
+    this.wire.request(index, begin, length);
+    this.queue++;
 };
 
 module.exports = Peer;
