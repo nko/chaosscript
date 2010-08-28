@@ -8,6 +8,10 @@ var Html = require('./html');
 Html.setTemplate('./public/template.htm');
 var legalTorrents = ['0f96f992d8623af45593d4b472efec65b5e54bf4'] // RetteDeineFreiheit.de_HD_high.mp4.torrent
 
+process.on('uncaughtException', function(e) {
+	       console.log(e.stack ? e.stack : e.toString());
+	   });
+
 /*
 function hexChar(v) {
     if (v >= 0 && v <= 9)
@@ -100,6 +104,50 @@ function acceptTorrent(infoHex, torrent, cb) {
 		      });
 }
 
+function streamer(req, res, next) {
+    var m;
+    if (req.method == 'GET' &&
+	(m = req.url.match(/^\/([0-9a-f]{40})\/(.+)/))) {
+
+	var infoHex = m[1];
+	var filename = m[2];
+
+	Model.getFileinfo(infoHex, function(error, fileinfo) {
+			      if (error === 'Not found') {
+				  res.writeHead(404, {});
+				  res.end('Not found');
+			      } else if (fileinfo) {
+				  var file;
+				  fileinfo.files.forEach(function(file1) {
+							     if (file1.name === filename)
+								 file = file1;
+							 });
+				  if (!file) {
+				      res.writeHead(404, {});
+				      res.end('Not found');
+				  } else {
+				      var ctx = TorrentManager.get(infoHex);
+				      var stream = ctx.stream(file.offset, file.length);
+				      req.socket.on('end', function() {
+							stream.end();	
+						    });
+				      stream.on('data', function(data) {
+						    res.write(data);
+						});
+				      stream.on('end', function() {
+						    res.end();
+						});
+				      res.writeHead(200, {'Content-Type': 'binary/octet-stream'});
+				  }
+			      } else
+				  throw error;
+			  });
+
+    } else {
+	next();
+    }
+}
+
 function app(app) {
     app.post('/up', function(req, res) {
 		 var form = new Formidable.IncomingForm();
@@ -132,24 +180,6 @@ function app(app) {
 		};
 		res.writeHead(200, {});
 		res.end(JSON.stringify(response));
-	    });
-    app.get('/:infoHex/:filename', function(req, res) {
-		var infoHex = req.params.path.infoHex;
-		var filename = req.params.path.filename;
-		Model.getFileinfo(infoHex, function(error, fileinfo) {
-				      if (error === 'Not found') {
-					  res.writeHead(404, {});
-					  res.end('Not found');
-				      } else if (fileinfo) {
-					  var file;
-					  fileinfo.files.forEach(function(file1) {
-								     if (file1.name === filename)
-									 file = file1;
-								 });
-					  // TODO: create a Desire for this req
-				      } else
-					  throw error;
-				  });
 	    });
     app.get('/:infoHex.html', function(req, res) {
         var fi = Model.getFileinfo(req.params.path.infoHex, function(error, fileinfo) {
@@ -207,6 +237,7 @@ function app(app) {
 Connect.createServer(
     Connect.logger(),
     Connect.staticProvider(__dirname + '/public'),
+    streamer,
     Connect.router(app),
     Connect.errorHandler({ dumpExceptions: true, showStack: true })
 ).listen(parseInt(process.env.PORT || "8001", 10));
