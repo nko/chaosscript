@@ -197,23 +197,24 @@ function app(app) {
     });
     app.get('/:infoHex.html', function(req, res) {
         console.log('Im in the show-action!');
-		var filelist = ''
-        Model.getFileinfo(req.params.infoHex, function(error, fileinfo) {
+        Model.getFileinfo(req.params.path.infoHex, function(error, fileinfo) {
 		    if (error === 'Not found') {
-			    res.writeHead(404, {});
-			    res.end('Not found');
+			res.writeHead(404, {});
+			res.end('Not found');
 		    } else if (fileinfo) {
-			    fileinfo.files.forEach(function(f) {
-    			    var fLink = Html.tag('a',{'href':'#'},f.name+'');
-	    		    filelist += Html.tag('li',{'class':'file'}, fLink);
-    		    });
+			var filelist = '';
+			fileinfo.files.forEach(
+			    function(file) {
+    				var fLink = Html.tag('a',{'href':'#'},file.name+'');
+	    			filelist += Html.tag('li',{'class':'file'}, fLink);
+    			    });
+			res.writeHead(200, {});
+			console.log('just before show output');
+			res.write(Html.show(filelist));
+			res.end();
 		    } else
-				  throw error;
+			throw error;
 		});
-        res.writeHead(200, {});
-        console.log('just before show output');
-        res.write(Html.show(filelist));
-        res.end();
     });
 }
 
