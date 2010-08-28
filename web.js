@@ -4,7 +4,6 @@ var BEnc = require('benc');
 var Model = require('./model');
 var TorrentManager = require('./torrent_manager');
 var Html = require('./html');
-var sys = require('sys');
 
 Html.setTemplate('./public/template.htm');
 var legalTorrents = ['0f96f992d8623af45593d4b472efec65b5e54bf4'] // RetteDeineFreiheit.de_HD_high.mp4.torrent
@@ -162,7 +161,7 @@ function app(app) {
 				    acceptTorrent(infoHex, torrentfile.torrent,
 						  function() {
 						      res.writeHead(302,
-								    { Location: '/' + infoHex });
+								    { Location: '/' + infoHex + '.html' });
 						      res.end();
 						  });
 				} else {
@@ -182,7 +181,19 @@ function app(app) {
 		res.writeHead(200, {});
 		res.end(JSON.stringify(response));
 	    });
-    app.get('/:infoHex', function(req, res) {
+    app.get('/', function(req, res) {
+        console.log('Im in the index-action!');
+        var torrentItemString = '';
+        legalTorrents.forEach(function(t){
+            torrentItemString += Html.tag('li',[], Html.tag('a', {'href':'/'+t+'.html'},'Some Torrent'));
+        });
+        res.writeHead(200, {});
+        console.log('just before index output');
+        res.write(Html.index( torrentItemString ));
+        res.end();
+    });
+    app.get('/:infoHex.html', function(req, res) {
+        console.log('Im in the show-action!');
 		var filelist = ''
         Model.getFileinfo(req.params.infoHex, function(error, fileinfo) {
 		    if (error === 'Not found') {
@@ -196,44 +207,9 @@ function app(app) {
 		    } else
 				  throw error;
 		});
-        var someContent = Html.tag('div', {'class':'metainfos'}, 'this is a test');
-        someContent += Html.tag('ul', {'class':'filetree'}, filelist);
-        someContent += Html.tag('p',{'class':'bottom'},'');
         res.writeHead(200, {});
-        Html.fillWith(someContent);
-        res.write(Html.show());
-        res.end();
-    });
-    app.get('/', function(req, res) {
-    
-        var someContent = Html.tag( 'input', { 'name':'torrentfile',
-                                               'type':'file',
-                                               'class': 'fileinput'});
-        someContent += Html.tag('input',{'type':'submit'});
-        someContent = Html.tag( 'form', { 'action':'/up',
-                                          'method':'post',
-                                          'enctype':'multipart/form-data',
-                                          'class':'uploadform'},
-                                       someContent);
-        var helpUsMsg = 'Help us win Node.js KO!';
-        var img = Html.tag( 'img', { 'src':'http://nodeknockout.com/images/voteko.png',
-                                      'alt':helpUsMsg});
-        someContent += Html.tag( 'a', { 'href':'http://nodeknockout.com/teams/chaosscript',
-                                        'target':'nko',
-                                        'title':helpUsMsg,
-                                        'class':'pleasevote' },
-                                     img);
-        var torrents = '';
-        legalTorrents.forEach(function(t){
-            torrents += Html.tag('il',[], Html.tag('a', {'href':'/'+t},'Some Torrent'));
-        });
-//        someContent += torrents;
-        someContent += Html.tag('ul', {'class':'left'}, torrents);
-        someContent += Html.tag('div', {'class':'right'}, Html.tag('p',[],'Lorem ipsum'));
-        someContent += Html.tag('p',{'class':'bottom'},'');
-        Html.fillWith(someContent);
-        res.writeHead(200, {});
-        res.write(Html.show());
+        console.log('just before show output');
+        res.write(Html.show(filelist));
         res.end();
     });
 }
