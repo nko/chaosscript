@@ -159,3 +159,14 @@ li.closed-dir ul {
   background-image:url(img/tv.png);
 }
 
+ul.torrents {
+    list-style-type: none;
+    padding: 0;
+    padding-left: -16px;
+    margin: 1em;
+}
+ul.torrents li:before {
+    content: url('/img/bitsuckr.png');
+    padding: 2px 1px;
+    margin-left: -16px;
+}

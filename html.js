@@ -35,7 +35,7 @@ module.exports = {
                                       'title':helpUsMsg,
                                       'class':'pleasevote' },
                                    img);
-        someContent += M.tag('ul', {'class':'left'}, torrents);
+        someContent += M.tag('ul', {'class':'left torrents'}, torrents);
         someContent += M.tag('div', {'class':'right'}, M.tag('p',[],'Lorem ipsum'));
         someContent += M.tag('p',{'class':'bottom'},'');
         return M.fillWith( someContent );
