@@ -3,6 +3,8 @@ var BEnc = require('benc');
 var URL = require('url');
 var http = require('http');
 var TM = require('./torrent_manager');
+var Peer = require('./peer');
+var PieceMap = require('piecemap');
 
 var TorrentContext = module.exports = function(tm, infoHex) {
     var that = this;
@@ -10,14 +12,35 @@ var TorrentContext = module.exports = function(tm, infoHex) {
     this.tm = tm;
     this.infoHex = infoHex;
     this.infoHash = hexToBin(infoHex);
+    this.peerId = generatePeerId();
     this.trackers = {};
     this.bytesDownloaded = 0;
     this.bytesLeft = 1024 * 1024 * 1024;
+    this.peers = {};
+    this.size = 0;
+    Model.getFileinfo(infoHex, function(error, fileinfo) {
+			  if (error)
+			      throw error;
+
+			  fileinfo.files.forEach(function(file) {
+						     that.size += file.length;
+						 });
+			  var pieceNum = Math.ceil(that.size / fileinfo.pieceLength);
+			  that.piecemap = new PieceMap(pieceNum);
+		      });
 
     this.tryAnnounce();
     setInterval(function() {
 		    that.tryAnnounce();
 		}, 2000);
+};
+
+TorrentContext.prototype.addPeer = function(host, port) {
+    if (!this.peers.hasOwnProperty(host)) {
+	var peer = this.peers[host] = new Peer(this, host, port);
+	console.log({host:host,port:port});
+	peer.connect();
+    }
 };
 
 TorrentContext.prototype.refreshTrackers = function(cb) {
@@ -64,7 +87,6 @@ TorrentContext.prototype.announce = function(url) {
     cl.on('error', function(e) {
 	      console.log(e.stack);
 	  });
-console.log(u.pathname + '?' + this.makeAnnounceQuery());
     var req = cl.request('GET', u.pathname + '?' + this.makeAnnounceQuery(),
 			 {'Host': u.hostname});
     req.end();
@@ -79,7 +101,9 @@ console.log(u.pathname + '?' + this.makeAnnounceQuery());
 				     that.trackers[url].next = Date.now() + resDict.interval * 1000;
 				 if (resDict.peers) {
 				     var peers = parsePeers(resDict.peers);
-				     console.log({peers:peers});
+				     peers.forEach(function(peer) {
+						       that.addPeer(peer.host, peer.port);
+						   });
 				 }
 			     });
 	       } else {
@@ -120,13 +144,13 @@ function hexValue(v) {
 function hexToBin(s) {
     var r = new Buffer(s.length / 2);
     for(var i = 0; i < r.length; i++) {
-	r[i] = (hexValue(s.charCodeAt(i * 2)) << 4) | hexValue(s.charCodeAt(i * 2));
+	r[i] = (hexValue(s.charCodeAt(i * 2)) << 4) | hexValue(s.charCodeAt(i * 2 + 1));
     }
+console.log({s:s,r:r});
     return r;
 }
 
 function parsePeers(data) {
-console.log({parsePeers:data});
     var r = [];
     if (data.constructor === Array) {
 	data.forEach(function(peer) {
@@ -145,4 +169,8 @@ console.log({parsePeers:data});
 	}
     }
     return r;
+}
+
+function generatePeerId() {
+	return new Buffer("-BS00-YOYOYOYOYOYOYO");
 }
