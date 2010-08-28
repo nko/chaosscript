@@ -18,7 +18,7 @@ h1 {
 
 .head {
   width:99%;
-  vertical-align:center;
+  vertical-align:middle;
   margin-left:15px;
   margin-top:0px;
   text-align:left;
@@ -75,8 +75,16 @@ li.opened-dir {
   list-style-image:url(img/minus.png);
 }
 
+li.opened-dir ul {
+  visibility:visible;
+}
+
 li.closed-dir {
   list-style-image:url(img/plus.png);
+}
+
+li.closed-dir ul {
+  visibility:hidden;
 }
 
 .right {

@@ -4,14 +4,15 @@
     <title>bitsuckr</title>
     <link rel="shortcut icon" href="favicon.ico" />
     <link rel="stylesheet" href="main.css" />
-    
+    <script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="js/application.js"></script>
   </head>
   <body>
-    <div class="head"><img src="bitsuckr-head.png"/><h1>Bitsuckr</h1></div>
-    <form action="/upload" method="post" class="uploadform">
-      <input name="torrentfile" type="file" class="fileinput"/>
-    </form>
-    <ul>
+    <div class="head"><img src="img/bitsuckr-head.png"/><h1>Bitsuckr</h1></div>
+    <div class="metainfos">
+      <p>Hi, here are some metainfos!</p>
+    </div>
+    <ul class="filetree">
       <li class="file"><a href="#">Some File</a></li>
       <li class="opened-dir">
         <a href="#" class="selected">Some Dir</a>
@@ -20,17 +21,8 @@
           <li class="file">
             <a href="#" class="selected">Some File</a>
             <div class="filemenu">
-              <a href="#">View</a>
+              <a href="#" class="viewmovie">View</a>
               <a href="#">Url</a>
-            </div>
-            <div class="video">
-              <video width="560" height="340" controls>
-                <source src="somevideo.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-                <source src="somevideo.ogv" type='video/ogg; codecs="theora, vorbis"'>
-                <object width="640" height="384" type="application/x-shockwave-flash" data="somevideo.bla">
-                  <param name="movie" value="somevideo.bla" />
-                </object>
-              </video>
             </div>
           </li>
         </ul>
