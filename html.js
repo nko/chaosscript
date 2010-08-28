@@ -11,8 +11,7 @@ module.exports = {
       var someContent = M.tag('div', {'class':'metainfos'}, 'M is a test');
       someContent += M.tag('ul', {'class':'filetree'}, filelist);
       someContent += M.tag('p',{'class':'bottom'},'');
-      M.fillWith( someContent );
-      return template;
+      return M.fillWith( someContent );
     },
     index: function( torrents ) {
       var M = module.exports;
@@ -36,9 +35,7 @@ module.exports = {
       someContent += M.tag('ul', {'class':'left'}, torrents);
       someContent += M.tag('div', {'class':'right'}, M.tag('p',[],'Lorem ipsum'));
       someContent += M.tag('p',{'class':'bottom'},'');
-      M.fillWith( someContent );
-      
-      return template;
+      return M.fillWith( someContent );
     },
     get: function() {
       return template;
@@ -60,7 +57,7 @@ module.exports = {
     fillWith: function( content, placeholder ) {
         if (typeof(placeholder)=='undefined')
             var placeholder = '%CONTENT%';
-        return template = (template+'').replace( placeholder, content );
+        return (template+'').replace( placeholder, content );
     }
 };
 
