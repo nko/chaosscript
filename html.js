@@ -62,12 +62,15 @@ module.exports = {
     },
     generateFilelist: function( files ) {
         var M = module.exports;
-        filelist = ''
+        filelist = '';
         for (var filename in files) {
             var file = files[filename];
             var fLink = M.tag('a',{'href':'#'},filename+'');
-            var cssClass = ((file['type'] == 'file') ? 'file' : 'opened-dir');
-            filelist += M.tag('li',{'class':'file'}, fLink);
+            if (file['type'] == 'file') {
+                filelist += M.tag('li',{'class':'file'}, fLink);
+            } else {
+                filelist += M.tag('li',{'class':'opened-dir'}, fLink + M.generateFilelist(file['files']));
+            }
         }
         return filelist;
     }

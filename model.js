@@ -48,18 +48,18 @@ module.exports = {
                           cb(null, list);
                       }
                   });
-
+    },
     parseTreeByFiles: function( fileList ) {
         var result = {};
         fileList.forEach(function(f) {
 //            root = (new Buffer(f.name)).join('').split('/')[0];
-            root = f.name.split('/')[0];
-            result[root] = (result[root] || {});
-            if (f.name.indexOf('/' != -1)) { // Directory
-                result[root]['type'] = 'directory';
-                result[root]['files'] = (result[root]['files'] || {});
+            path = f.name.split('/');
+            result[path[0]] = (result[path[0]] || {});
+            if (path.length > 1) { // Directory
+                result[path[0]]['type'] = 'directory';
+                result[path[0]]['files'] = (result[path[0]]['files'] || {});
             } else { // File
-                result[root]['type'] = ['file'];
+                result[path[0]]['type'] = ['file'];
             }
           });
         fileList
