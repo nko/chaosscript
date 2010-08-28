@@ -8,7 +8,7 @@ module.exports = {
     },
     show: function( files ) {
         var M = module.exports;
-        var someContent = M.tag('div', {'class':'metainfos'}, 'Stringing the swarm...');
+        var someContent = M.tag('div', {'class':'metainfos'}, 'Stinging the swarm...');
         var filelist = M.generateFilelist( files );
         someContent += M.tag('ul', {'class':'filetree'}, filelist);
         someContent += M.tag('p',{'class':'bottom'},'');
