@@ -18,7 +18,7 @@ module.exports = {
       var someContent = M.tag( 'input', { 'name':'torrentfile',
                                              'type':'file',
                                              'class': 'fileinput'});
-      someContent += M.tag('input',{'type':'submit'});
+      someContent += M.tag('input', {'type':'submit'});
       someContent = M.tag( 'form', { 'action':'/up',
                                         'method':'post',
                                         'enctype':'multipart/form-data',
