@@ -99,7 +99,10 @@ TorrentContext.prototype.workStreams = function() {
 TorrentContext.prototype.onActivity = function() {
     this.lastActivity = Date.now();
     this.workStreams();
+    this.onInfoUpdate();
+};
 
+TorrentContext.prototype.onInfoUpdate = function() {
     if (this.infoWaiters) {
 	info = { peers: { total: 0 } };
 	this.peers.forEach(function(peer) {
@@ -234,6 +237,7 @@ TorrentContext.prototype.announce = function(url) {
                                      peers.forEach(function(peer) {
                                                        that.addPeer(peer.host, peer.port);
                                                    });
+				     that.onInfoUpdate();
                                  }
                              });
                } else {

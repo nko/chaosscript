@@ -45,8 +45,8 @@ function pollInfo(infoHex) {
     $.ajax({ url: '/' + infoHex + '.json',
 	     dataType: 'json',
 	     success: function(info) {
-		 $('.metainfos').text(info.peers.connected + '/' +
-				      info.peers.total + ' peers connected');
+		 $('.metainfos').text((info.peers.connected || 0) + '/' +
+				      (info.peers.total || 0) + ' peers connected');
 
 		 pollInfo(infoHex);
 	     },
