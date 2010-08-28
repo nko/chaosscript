@@ -7,34 +7,36 @@ module.exports = {
         });
     },
     show: function( filelist ) {
-      var someContent = this.tag('div', {'class':'metainfos'}, 'this is a test');
-      someContent += this.tag('ul', {'class':'filetree'}, filelist);
-      someContent += this.tag('p',{'class':'bottom'},'');
-      this.fillWith( someContent );
+      var M = module.exports;
+      var someContent = M.tag('div', {'class':'metainfos'}, 'M is a test');
+      someContent += M.tag('ul', {'class':'filetree'}, filelist);
+      someContent += M.tag('p',{'class':'bottom'},'');
+      M.fillWith( someContent );
       return template;
     },
     index: function( torrents ) {
-      var someContent = this.tag( 'input', { 'name':'torrentfile',
+      var M = module.exports;
+      var someContent = M.tag( 'input', { 'name':'torrentfile',
                                              'type':'file',
                                              'class': 'fileinput'});
-      someContent += this.tag('input',{'type':'submit'});
-      someContent = this.tag( 'form', { 'action':'/up',
+      someContent += M.tag('input',{'type':'submit'});
+      someContent = M.tag( 'form', { 'action':'/up',
                                         'method':'post',
                                         'enctype':'multipart/form-data',
                                         'class':'uploadform'},
                                      someContent);
       var helpUsMsg = 'Help us win Node.js KO!';
-      var img = this.tag( 'img', { 'src':'http://nodeknockout.com/images/voteko.png',
+      var img = M.tag( 'img', { 'src':'http://nodeknockout.com/images/voteko.png',
                                     'alt':helpUsMsg});
-      someContent += this.tag( 'a', { 'href':'http://nodeknockout.com/teams/chaosscript',
+      someContent += M.tag( 'a', { 'href':'http://nodeknockout.com/teams/chaosscript',
                                       'target':'nko',
                                       'title':helpUsMsg,
                                       'class':'pleasevote' },
                                    img);
-      someContent += this.tag('ul', {'class':'left'}, torrents);
-      someContent += this.tag('div', {'class':'right'}, this.tag('p',[],'Lorem ipsum'));
-      someContent += this.tag('p',{'class':'bottom'},'');
-      this.fillWith( someContent );
+      someContent += M.tag('ul', {'class':'left'}, torrents);
+      someContent += M.tag('div', {'class':'right'}, M.tag('p',[],'Lorem ipsum'));
+      someContent += M.tag('p',{'class':'bottom'},'');
+      M.fillWith( someContent );
       
       return template;
     },
@@ -42,10 +44,11 @@ module.exports = {
       return template;
     },
     tag: function( tagName, opts, content ) {
+        var M = module.exports;
         if (typeof(content)=='undefined')
-            return '<'+tagName+' '+this.optsToStr(opts)+' />';
+            return '<'+tagName+' '+M.optsToStr(opts)+' />';
         else
-            return '<'+tagName+' '+this.optsToStr(opts)+'>'+content+'</'+tagName+'>';
+            return '<'+tagName+' '+M.optsToStr(opts)+'>'+content+'</'+tagName+'>';
     },
     optsToStr: function( opts ) {
         var result = '';
