@@ -57,6 +57,7 @@ function handleTorrentUpload(part) {
 function acceptTorrent(infoHex, torrent, cb) {
     var fileinfo = {
 	pieceLength: torrent.info['piece length'],
+	name: torrent.info.name,
 	files: []
     };
     if (torrent.info.files) {
