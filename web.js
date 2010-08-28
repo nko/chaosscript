@@ -3,6 +3,9 @@ var Formidable = require('formidable');
 var BEnc = require('benc');
 var Model = require('./model');
 var TorrentManager = require('./torrent_manager');
+var Html = require('./html');
+
+Html.setTemplate('./public/template.htm');
 
 /*
 function hexChar(v) {
@@ -117,6 +120,14 @@ function app(app) {
 				}
 			    });
 	     });
+
+    app.get('/test', function(req, res) {
+        res.writeHead(200, {});
+        var someContent = Html.tag('div', {'class':'metainfos'}, 'this is a test');
+        Html.fillWith(someContent);
+        res.write(Html.show());
+        res.end();
+    })
 
     app.get('/:infoHex.json', function(req, res) {
 		var infoHex = req.params.path.infoHex;
