@@ -118,8 +118,7 @@ Stream.prototype.receive = function(offset, data) {
 	    var desireDataIndex = desire.dataOffset - desire.offset;
 	    if (desireDataIndex < desire.data.length) {
 		data.copy(desire.data, desireDataIndex, dataIndex);
-		//console.log({dataOffset:desire.dataOffset, length:
-	    data.length, idx: dataIndex});
+		//console.log({dataOffset:desire.dataOffset, length: data.length, idx: dataIndex});
 		desire.dataOffset += data.length - dataIndex;
 		break;
 	    }
