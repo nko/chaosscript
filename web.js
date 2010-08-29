@@ -106,6 +106,10 @@ function acceptTorrent(infoHex, torrent, cb) {
 
 function streamer(req, res, next) {
     var m;
+    var inline = req.url.match(/\?inline$/);
+    if (inline)
+        req.url = req.url.replace( '?inline', '' );
+    
     if (req.method == 'GET' &&
         (m = req.url.match(/^\/([0-9a-f]{40})\/(.+)/))) {
 
@@ -130,6 +134,8 @@ function streamer(req, res, next) {
                                       var ctx = TorrentManager.get(infoHex);
                                       var resHeaders = {'Content-Type': MIME.fileType(filename),
                                                         'Accept-Ranges': 'bytes'};
+                                      if (inline)
+                                          resHeaders['Content-Disposition'] = 'inline; filename="'+filename+'"';
                                       var offset = file.offset;
                                       var length = file.length;
                                       var m;
