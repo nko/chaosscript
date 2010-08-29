@@ -2,8 +2,8 @@ var EventEmitter = require('events').EventEmitter;
 var sys = require('sys');
 
 // what we request:
-var CHUNK_SIZE = 16 * 1024;
-var CACHED_CHUNKS = 10;
+var CHUNK_SIZE = 8 * 1024;
+var CACHED_CHUNKS = 160;
 
 function Stream(offset ,length) {
     EventEmitter.call(this);

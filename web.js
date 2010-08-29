@@ -170,7 +170,7 @@ function streamer(req, res, next) {
 
 function app(app) {
     app.get('/stats.json', function(req, res) {
-                res.writeHead(200, {});
+                res.writeHead(200, {'Content-Type': 'application/json'});
                 var stats = TorrentManager.getStats();
                 stats.web = webStats;
                 res.end(JSON.stringify(stats));
@@ -205,7 +205,7 @@ function app(app) {
                 var ctx = TorrentManager.get(infoHex);
 
                 ctx.waitInfo(function(info) {
-                                 res.writeHead(200, {});
+                                 res.writeHead(200, {'Content-Type': 'application/json'});
                                  res.end(JSON.stringify(info));
                              });
             });
