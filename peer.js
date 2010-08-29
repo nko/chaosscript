@@ -70,10 +70,10 @@ Peer.prototype.onPkt = function(pkt) {
                downScoring = function() {
                    if (that.choked || !that.socket)
                        clearInterval(intervalId);
-                   else if (that.reqs.length > 0)
-                       that.score -= 20;
+                   else if (that.reqs && that.reqs.length > 0)
+                       that.score -= 5;
                };
-               intervalId = setInterval(downScoring, 1000);
+               intervalId = setInterval(downScoring, 100);
            });
     pkt.on('choke', function() {
                that.choked = true;

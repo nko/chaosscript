@@ -40,8 +40,8 @@ Stream.prototype.nextDesired = function() {
 		continue;
 	    }
 
-            // request the same piece every 10s
-            if (!desire.data && desire.last <= now - 10 * 1000) {
+            // request the same piece every 4s
+            if (!desire.data && desire.last <= now - 4 * 1000) {
                 // First things first
                 if (!result || o < result.offset)
                     result = { offset: Number(o),
