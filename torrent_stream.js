@@ -34,7 +34,7 @@ Stream.prototype.growCache = function() {
 
 	var remaining = this.length + this.offset - o;
         this.cache.push({ offset: o,
-			  length: (remaining > CHUNK_SIZE) ? CHUNK_SIZE : remaining,
+			  length: Math.min(CHUNK_SIZE, remaining),
 			  last: 0 });
     }
 
@@ -59,11 +59,22 @@ Stream.prototype.nextDesired = function() {
 			       return;
 			   }
 
-			   // request the same piece every 4s
-			   if (!desire.data && desire.last <= now - 4 * 1000) {
-			       // First things first
-			       if (!best || desire.offset < best.offset)
-				   best = desire;
+			   if (!desire.data) {
+			       // request the same piece again, if it was
+			       // pending for too long. base is 1s, up to
+			       // 20s depening on the square root of
+			       // progress.
+			       //
+			       // avoids re-requesting for slightly slow senders,
+			       // but should skip stuck peers quite soon.
+			       var desireProgress = (desire.offset - that.offset) / (CACHED_CHUNKS * CHUNK_SIZE);
+			       var timeout = (8 + 11 * Math.sqrt(desireProgress)) * 1000;
+
+			       if (desire.last <= now - timeout) {
+				   // First things first
+				   if (!best || desire.offset < best.offset)
+				       best = desire;
+			       }
 			   }
 		       });
 
@@ -82,39 +93,86 @@ Stream.prototype.nextDesired = function() {
     }
 };
 
+// Oh shit, I fear this is full of redundancy. NodeKO leaves me no
+// other choi
 Stream.prototype.receive = function(offset, data) {
     //console.log({receive:offset,len:data.length});
 
     var i, desire;
     for(i = 0; i < this.cache.length; i++) {
 	desire = this.cache[i];
-	if (offset <= desire.offset && offset + data.length >= desire.offset) {
+
+	if (offset <= desire.offset &&
+	    offset + data.length >= desire.offset) {
+
+	    // data overlaps desire offset
 	    data = data.slice(desire.offset - offset, data.length);
 	    if (desire.length < data.length) {
 		desire.data = data.slice(0, desire.length);
 		data = data.slice(desire.length, data.length);
 	    } else {
-		desire.data = data;
+		desire.data = data.slice(0, Math.min(desire.length, data.length));
+
+		if (desire.length > data.length) {
+		    // Too few data, create a smaller succeeding desire,
+		    // with last request set to now, so we can collect
+		    // succeeding buffers without re-requesting immediately.
+		    var afterDesire = { offset: desire.offset + desire.data.length,
+					length: desire.length - desire.data.length,
+					last: Date.now() };
+		    this.cache.splice(i + 1, 0, afterDesire);
+		    //console.log({inserted: newDesire});
+		}
+		desire.length = desire.data.length;
 		break;
 	    }
-	}
+	} else if (offset >= desire.offset &&
+		   offset < desire.offset + desire.length) {
+	    // data begins within desire
+
+	    if (offset > desire.offset) {
+		var beforeDesire = { offset: desire.offset,
+				     length: offset - desire.offset,
+				     last: desire.last
+				   };
+		this.cache.splice(i, 0, beforeDesire);
+		i++;
+	    }
+	    if (offset + data.length < desire.offset + desire.length) {
+		// not enough!
+		var afterDesire = { offset: offset + data.length,
+				    length: desire.offset + desire.length - offset - data.length,
+				    last: desire.last
+				  };
+		this.cache.splice(i + 1, 0, afterDesire);
+		i++;
+	    }
+	    desire.offset = offset;
+	    desire.data = data.slice(0, Math.min(desire.length, data.length));
+	    desire.length = desire.data.length;
+console.log({before:beforeDesire,desire:desire,afterDesire: afterDesire});
+	} else if (offset + data.length <= desire.length)
+	    break;
     }
     if (i < this.cache.length) {
-	if (desire.length > data.length) {
-            // Too few data, create a smaller succeeding desire,
-            // with last request set to now, so we can collect
-            // succeeding buffers without re-requesting immediately.
-	    var newDesire = { offset: desire.offset + desire.data.length,
-			      length: desire.length - desire.data.length,
-			      last: Date.now() };
-	    this.cache.splice(i + 1, 0, newDesire);
-	    //console.log({inserted: newDesire});
-	}
-	desire.length = desire.data.length;
-
         this.walkCaches();
-    } else
+    } else {
 	console.warn('Ouch: did not find cache desire for offset ' + offset);
+	/*this.cache.forEach(function(desire) {
+			       console.log({ // no data
+					       offset: desire.offset,
+					       length: desire.length,
+					       last: desire.last
+					   });
+			   });*/
+    }
+
+    // TODO: rm in production
+    var s = '';
+    this.cache.forEach(function(desire) {
+			   s += desire.data ? '+' : '-';
+		       });
+    console.log(this.offset + ': ' + s);
 };
 
 // Resets cache entries
@@ -145,13 +203,6 @@ Stream.prototype.walkCaches = function() {
                              that.walkCaches();
                          });
     }
-
-    // TODO: rm in production
-    var s = '';
-    this.cache.forEach(function(desire) {
-			   s += desire.data ? '+' : '-';
-		       });
-    console.log(this.offset + ': ' + s);
 };
 
 Stream.prototype.write = function(data) {
