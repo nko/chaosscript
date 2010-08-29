@@ -213,7 +213,6 @@ function app(app) {
                 webStats.root++;
                 var torrentItemString = '';
                 recommendations.forEach(function(r) {
-                                            console.log(r);
                                             torrentItemString += Html.tag('li',[], Html.tag('a', {href:'/'+r.infoHex + '.html'},r.name));
                                         });
                 res.writeHead(200, {});
@@ -227,7 +226,6 @@ function app(app) {
                                           res.end('Not found');
                                       } else if (fileinfo) {
                                           var files = Model.parseTreeByFiles(fileinfo.files, req.params.infoHex);
-                                          console.log(files);
                                           res.writeHead(200, {});
                                           res.write(Html.show(files));
                                           res.end();
