@@ -32,7 +32,10 @@ Stream.prototype.growCache = function() {
         o < this.offset + this.length && o < this.offset + CACHED_CHUNKS * CHUNK_SIZE;
         o += CHUNK_SIZE) {
 
-        this.cache.push({ offset: o, length: CHUNK_SIZE, last: 0 });
+	var remaining = this.length + this.offset - o;
+        this.cache.push({ offset: o,
+			  length: (remaining > CHUNK_SIZE) ? CHUNK_SIZE : remaining,
+			  last: 0 });
     }
 
     /*console.log({grown:this.cache.map(function(desire) {
@@ -65,8 +68,12 @@ Stream.prototype.nextDesired = function() {
 		       });
 
     if (best) {
-	return { offset: best.offset,
-		 length: best.length || CHUNK_SIZE,
+	// Many many many clients need offset chunk-aligned
+	var offset = Math.floor(best.offset / CHUNK_SIZE) * CHUNK_SIZE;
+	//var length = best.length + best.offset - offset;
+
+	return { offset: offset,
+		 length: CHUNK_SIZE,
 		 requested: function() {
 		     //console.log({next: best});
 		     best.last = Date.now();
