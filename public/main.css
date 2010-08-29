@@ -88,7 +88,6 @@ a:hover, a:active {
 
 .left, .right, ul {
   text-align:left;
-  overflow-x:hidden;
 }
 
 .left, .right {
@@ -98,6 +97,7 @@ a:hover, a:active {
 .left {
   float:left;
   clear:left;
+  overflow-x:hidden;
 }
 
 li a, li span {
