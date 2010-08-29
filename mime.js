@@ -2,7 +2,7 @@ var types = {
     ogg: 'application/ogg',
     mp3: 'audio/mpeg',
     txt: 'text/plain',
-    nfo: 'text/plain; charset=cp437',
+    nfo: 'text/plain; charset="cp437"',
     pdf: 'application/pdf',
     svg: 'image/svg+xml',
     jpeg: 'image/jpeg',
