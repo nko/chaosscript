@@ -4,6 +4,7 @@ var BEnc = require('benc');
 var Model = require('./model');
 var TorrentManager = require('./torrent_manager');
 var Html = require('./html');
+var MIME = require('./mime');
 
 process.on('uncaughtException', function(e) {
            console.log(e.stack ? e.stack : e.toString());
@@ -140,7 +141,7 @@ function streamer(req, res, next) {
                                       res.end('Not found');
                                   } else {
                                       var ctx = TorrentManager.get(infoHex);
-                                      var resHeaders = {'Content-Type': 'binary/octet-stream',
+                                      var resHeaders = {'Content-Type': MIME.fileType(filename),
                                                         'Accept-Ranges': 'bytes'};
                                       var offset = file.offset;
                                       var length = file.length;
