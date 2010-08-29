@@ -13,6 +13,12 @@ function Stream(offset ,length) {
     this.length = length;
     this.cache = [];  // desires, ordered by offset
     this.growCache();
+    if (this.length <= 0) {
+	var that = this;
+	process.nextTick(function() {
+			     that.end();
+			 });
+    }
 }
 sys.inherits(Stream, EventEmitter);
 
@@ -39,10 +45,12 @@ Stream.prototype.growCache = function() {
 };
 
 Stream.prototype.nextDesired = function() {
+    var that = this;
+
     var now = Date.now();
     var best;
     this.cache.forEach(function(desire) {
-			   if (desire.offset + desire.length <= this.offset) {
+			   if (desire.offset + desire.length <= that.offset) {
 			       // What's this doing here?
 			       console.log('Orphaned desire ' + desire.offset + '..' + desire.length + ', bad bad batshit');
 			       return;
