@@ -71,7 +71,7 @@ function showVideo( ele, path, mime ) {
     else if (jQuery.inArray(mime, qtarr) != -1)
         inp = '<OBJECT classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" width="'+w+'" height="'+h+'" codebase="http://www.apple.com/qtactivex/qtplugin.cab"><param name="src" value="'+path+'"><EMBED src="'+path+'" width="'+w+'" height="'+h+'" pluginspage="http://www.apple.com/quicktime/download/"></EMBED></OBJECT>';
     else
-        inp = '<video width="'+w+'" height="'+h+'" controls><source src="'+path+'" type="'+mime+'" />This browser is not compatible with HTML 5 or the given codec.</video>';
+        inp = '<video width="'+w+'" height="'+h+'" controls autobuffer autoplay><source src="'+path+'" type="'+mime+'" />This browser is not compatible with HTML 5 or the given codec.</video>';
     
     return showPreview( ele, '<div class="preview">'+inp+'</div>');
 }
@@ -91,7 +91,7 @@ function showImage( ele, path ) {
 
 function showAudio( ele, path ) {
     path = unescape(path);
-    return showPreview( ele, '<div class="preview"><audio controls><source src="'+path+'"></audio></div>' );
+    return showPreview( ele, '<div class="preview"><audio controls autobuffer autoplay><source src="'+path+'"></audio></div>' );
 }
 
 /*function showunknown( ele, path ) {
