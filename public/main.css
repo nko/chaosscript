@@ -92,6 +92,15 @@ li a, li span {
   padding-right:7px;
 }
 
+li.file:hover{
+  background-image:url(img/higlight.jpg);
+  background-position:center center;
+  background-repeat:left;
+  border-radius: 7pt 7pt;
+  -moz-border-radius: 7px;
+  -webkit-border-radius: 7px;
+}
+
 li a.selected {
   font-weight:bold;
   background-color:#FF4F04;
@@ -99,6 +108,10 @@ li a.selected {
   border-radius: 7pt 7pt;
   -moz-border-radius: 7px;
   -webkit-border-radius: 7px;
+}
+
+li .size {
+  font-size:9pt;
 }
 
 li.file {
@@ -148,30 +161,12 @@ a.pleasevote {
 }
 
 .filemenu {
-  background-color:#9BB0C9;
-  width:160px;
-  padding-top:9px;
-  padding-bottom:9px;
-  padding-left:5px;
-  padding-right:5px;
-  border-radius: 9pt 9pt;
-  -moz-border-radius: 9px;
-  -webkit-border-radius: 9px;
-  text-align:justify;
-  margin-left:30px;
-  margin-top:5px;
-  margin-bottom:5px;
-  box-shadow: 6px 6px 9px #888;
-  -webkit-box-shadow: 6px 6px 9px #888;
-  -moz-box-shadow: 6px 6px 9px #888;
+  float:right;
+  margin-right:50px;
 }
 
 .filemenu a {
   background-color:#7E8FA3;
-  padding-left:6px;
-  padding-right:6px;
-  margin-left:4px;
-  margin-right:4px;
   border-radius: 4pt 4pt;
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
@@ -179,6 +174,9 @@ a.pleasevote {
   border-top:none;
   border-left:none;
   font-weight:bold;
+  margin-left:5px;
+  font-size:10px;
+  
 }
 
 .filemenu a:hover {
@@ -214,11 +212,11 @@ pre {
   margin:auto;
 }
 
-.preview iframe {
+.preview iframe, .preview object {
   width:650px;
   height:600px;
   border:none;
-  margin:auto;
+  margin:auto auto;
 }
 
 .video {

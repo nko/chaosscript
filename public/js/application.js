@@ -1,7 +1,6 @@
 $(document).ready(function() {
     $('.preview').remove();
     $('.opened-dir').removeClass('opened-dir').addClass('closed-dir');
-    $('.filemenu').hide();
     $('.video').hide();
     
     $('.filetree a').bind('click', function() {
@@ -9,19 +8,18 @@ $(document).ready(function() {
         var p = e.parent();
         if (p.hasClass('filemenu'))
             return true;
-        var filemenu = p.children('.filemenu');
-        var fmHidden = filemenu.is(":visible");
-        $('.filemenu').hide();
         if (p.hasClass('opened-dir') || p.hasClass('closed-dir')) {
             p.children('ul').slideToggle('slow');
             p.toggleClass('opened-dir').toggleClass('closed-dir');
-        } else if (p.hasClass('file'))
-            if (fmHidden)
-                filemenu.toggle();
-            else
-                filemenu.slideToggle('slow');
-        $('.filetree a').removeClass('selected');
-        e.addClass('selected');
+        }
+//        $('.filetree a').removeClass('selected');
+//        e.addClass('selected');
+        return false;
+    });
+    
+    
+    $('.filetree li').bind('click', function() {
+        $(this).children('a').click();
         return false;
     });
 
