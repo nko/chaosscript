@@ -1,6 +1,6 @@
 var DESCRIPTION = 'Bitsuckr serves as a bridge between shiny HTML5 audio/video features and ' +
     'the best crowd-sourced media repository on the Internet. ' +
-    'It\'s the <a href="http://nodeknockout.com">NodeKnockout</a> submission by ' +
+    'It\'s the 48-hours <a href="http://nodeknockout.com">NodeKnockout</a> submission by ' +
     '<a href="http://spaceboyz.net/~astro/">Astro</a> and Alexander Adam. ' +
     'Node.js is put to real work here, it deals with all the BitTorrent traffic.<br>' +
     'BTW, Astro is looking for a diploma thesis very soon.';
