@@ -22,12 +22,25 @@ $(document).ready(function() {
 	pollInfo(m[1]);
 });
 
+var downloadedBefore, lastPoll;
 function pollInfo(infoHex) {
     $.ajax({ url: '/' + infoHex + '.json',
 	     dataType: 'json',
 	     success: function(info) {
-		 $('.metainfos').text((info.peers.connected || 0) + '/' +
-				      (info.peers.total || 0) + ' peers connected');
+		 var now = Date.now();
+		 var s = (info.peers.connected || 0) + '/' +
+		     (info.peers.total || 0) + ' peers connected';
+		 if (downloadedBefore && lastPoll) {
+		     var rate = Math.round((info.downloaded - downloadedBefore) /
+					   (now - lastPoll));
+		     if (isNaN(rate) || rate < 0)
+			 rate = 0;
+		     s += ', leeching with ' + rate + ' KB/s';
+		 }
+		 $('.metainfos').text(s);
+
+		 lastPoll = now;
+		 downloadedBefore = info.downloaded;
 
 		 pollInfo(infoHex);
 	     },
