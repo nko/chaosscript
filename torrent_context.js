@@ -374,5 +374,8 @@ function parsePeers(data) {
 }
 
 function generatePeerId() {
-        return new Buffer("-BS00-YOYOYOYOYOYOY0");
+    var peerId = new Buffer("-BS00-              ");
+    for(var i = 6; i < 20; i++)
+	peerId[i] = Math.ceil(Math.random * 255);
+    return peerId;
 }

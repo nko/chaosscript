@@ -55,7 +55,9 @@ setInterval(function() {
 /**
  * Wire listening stuff
  */
-var peerId = new Buffer("-BS00-YOYOYOYOYOYOY0");
+var peerId = new Buffer("-BS00-              ");
+for(var i = 6; i < 20; i++)
+    peerId[i] = Math.ceil(Math.random * 255);
 
 function checkInfoHash(infoHash) {
     var infoHex = binToHex(infoHash);
