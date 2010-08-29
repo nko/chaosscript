@@ -1,3 +1,8 @@
+var DESCRIPTION = 'Bitsuckr serves as a bridge between shiny HTML5 audio/video features and ' +
+    'the best crowd-sourced media repository on the Internet. ' +
+    'It\'s the <a href="http://nodeknockout.com">NodeKnockout</a> submission by ' +
+    '<a href="http://spaceboyz.net/~astro/">Astro</a> and Alexander Adam.<br>' +
+    'BTW, Astro is looking for a diploma thesis very soon.';
 var template = '';
 module.exports = {
     setTemplate: function( templatePath ) {
@@ -29,14 +34,14 @@ module.exports = {
                                      someContent);
         var helpUsMsg = 'Help us win Node.js KO!';
         var img = M.tag( 'img', { 'src':'http://nodeknockout.com/images/voteko.png',
-                                    'alt':helpUsMsg});
+                                  'alt':helpUsMsg});
         someContent += M.tag( 'a', { 'href':'http://nodeknockout.com/teams/chaosscript',
                                       'target':'nko',
                                       'title':helpUsMsg,
                                       'class':'pleasevote' },
                                    img);
         someContent += M.tag('ul', {'class':'left torrents'}, torrents);
-        someContent += M.tag('div', {'class':'right'}, M.tag('p',[],'Lorem ipsum'));
+        someContent += M.tag('div', {'class':'right'}, M.tag('p',[], DESCRIPTION));
         someContent += M.tag('p',{'class':'bottom'},'');
         return M.fillWith( someContent );
     },
