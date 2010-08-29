@@ -2,11 +2,21 @@ var net = require('net');
 var WP = require('wire_protocol');
 var PieceMap = require('piecemap');
 
-function Peer(ctx, host, port) {
+function Peer(ctx, opts) {
     this.ctx = ctx;
     this.state = 'unknown';
-    this.host = host;
-    this.port = port;
+    if (opts.host && opts.port) {
+	this.host = opts.host;
+	this.port = opts.port;
+    } else if (opts.socket && opts.wire) {
+	this.socket = opts.socket;
+	this.wire = opts.wire;
+	this.state = 'connected';
+	this.host = opts.socket.remoteAddress;
+	this.port = 6881;  // Uh, yeah
+	this.setupWire();
+    } else
+	throw 'Peer ctor opts';
 
     this.choked = true;
 }
@@ -26,20 +36,9 @@ Peer.prototype.connect = function() {
                                                         that.ctx.infoHash,
                                                         that.ctx.peerId);
                        that.wire.on('established', function() {
-                                        console.log('established');
                                         that.state = 'connected';
-                                        that.score = 0;  // KB/s, stupid
-                                        that.reqs = [];
-                                        that.wire.bitfield(that.ctx.piecemap);
-                                        that.wire.interested();
-                                    });
-                       that.wire.on('pkt', function(pkt) {
-                                        that.onPkt(pkt);
-                                    });
-                       that.wire.on('error', function(error) {
-                                        that.state = 'bad';
-                                        console.log("Peer "+that.host+":"+that.port+": "+error);
-                                    });
+					that.setupWire();
+				    });
                    });
     this.socket.on('error', function() {
                        delete that.socket;
@@ -55,6 +54,22 @@ Peer.prototype.connect = function() {
                        that.state = that.state == 'connected' ? 'closed' : 'bad';
                        this.choked = true;
                    });
+};
+
+Peer.prototype.setupWire = function() {
+    var that = this;
+
+    this.score = 0;  // KB/s, stupid
+    this.reqs = [];
+    this.wire.bitfield(this.ctx.piecemap);
+    this.wire.interested();
+    this.wire.on('pkt', function(pkt) {
+                     that.onPkt(pkt);
+                 });
+    this.wire.on('error', function(error) {
+                     that.state = 'bad';
+                     console.log("Peer "+that.host+":"+that.port+": "+error);
+                 });
 };
 
 Peer.prototype.onPkt = function(pkt) {
