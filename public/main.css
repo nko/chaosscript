@@ -171,6 +171,13 @@ pre {
 
 .preview img {
   max-width:650px;
+  margin:auto;
+}
+
+.preview iframe {
+  width:650px;
+  height:600px;
+  border:none;
 }
 
 .video {

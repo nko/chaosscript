@@ -62,7 +62,7 @@ module.exports = {
                       }
                   });
     },
-    parseTreeByFiles: function( fileList ) {
+    parseTreeByFiles: function( fileList, infohex ) {
         var result = {};
         fileList.forEach(function(f) {
             var path = f.name.split('/');
@@ -77,9 +77,11 @@ module.exports = {
                 result[path[0]]['files'][scndPart] = (result[path[0]]['files'][scndPart] || {});
                 result[path[0]]['files'][scndPart]['type'] = 'file';
                 result[path[0]]['files'][scndPart]['kind'] = fType;
+                result[path[0]]['files'][scndPart]['path'] = infohex+'/'+f.name;
             } else { // File
                 result[path[0]]['type'] = 'file';
                 result[path[0]]['kind'] = fType;
+                result[path[0]]['path'] = infohex+'/'+f.name;
             }
           });
         return result;

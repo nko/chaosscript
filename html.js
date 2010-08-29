@@ -70,7 +70,7 @@ module.exports = {
             var cont = (file['kind'] == 'unknown') ? M.tag('span',{},filename) : M.tag('a',{'href':'#'},filename);
             if (file['type'] == 'file') { // File
 //                console.log(filename +' is a file');
-                cont += M.filemenuFor(filename,file);
+                cont += M.filemenuFor(file);
                 fList += M.tag('li',{'class':'file'}, cont);
             } else { // Directory
                 cont += M.tag('ul',{}, M.generateFilelist(file['files']));
@@ -79,14 +79,14 @@ module.exports = {
         }
         return fList;
     },
-    filemenuFor: function( filename, fileData ) {
+    filemenuFor: function( fileData ) {
         if (fileData['kind'] == 'unknown')
             return '';
         var M = module.exports;
         var method = 'show'+fileData['kind'];
         var r = '';
         r += M.tag('a',{href:'#',
-                        onclick:'return '+method+"('"+escape(filename)+"');",
+                        onclick:'return '+method+"(this, '"+escape(fileData['path'])+"');",
                         'class':'viewmovie'},'View');
         r += M.tag('a',{href:'#'},'Url');
         return M.tag('div', {'class':'filemenu'}, r);

@@ -13,9 +13,8 @@ $(document).ready(function() {
       } else if (p.hasClass('file'))
             e.next().toggle();
       if (e.hasClass('selected'))
-      {
           $('.filetree a').removeClass('selected');
-      } else {
+      else {
           $('.filetree a').removeClass('selected');
           e.addClass('selected');
       }
@@ -44,31 +43,31 @@ function pollInfo(infoHex) {
 	   });
 }
 
-function showVideo( path ) {
+function showVideo( ele, path ) {
     path = unescape(path);
-    return showPreview('<div class="preview video"><video width="560" height="340" controls><source src="'+path+'" type=\'video/mp4; codecs="avc1.42E01E, mp4a.40.2"\'><source src="'+path+'" type=\'video/ogg; codecs="theora, vorbis"\'><object width="640" height="384" type="application/x-shockwave-flash" data="'+path+'"><param name="movie" value="'+path+'" /></object></video></div>');
+    return showPreview( ele, '<div class="preview video"><video width="560" height="340" controls><source src="'+path+'" type=\'video/mp4; codecs="avc1.42E01E, mp4a.40.2"\'><source src="'+path+'" type=\'video/ogg; codecs="theora, vorbis"\'><object width="640" height="384" type="application/x-shockwave-flash" data="'+path+'"><param name="movie" value="'+path+'" /></object></video></div>');
 }
 
 
-function showText( path ) {
+function showText( ele, path ) {
     path = unescape(path);
-    return showPreview('<div class="preview"><iframe src="'+path+'">Sorry, no iframe for you</iframe></div>');
+    return showPreview( ele, '<div class="preview"><iframe src="'+path+'">Sorry, no iframe for you</iframe></div>');
 }
 
-function showGraphic( path ) {
+function showGraphic( ele, path ) {
     path = unescape(path);
-    return showPreview('<div class="preview"><img src="'+path+'" alt="preview"></div>');
+    return showPreview( ele, '<div class="preview"><img src="'+path+'" alt="picture is loading..."></div>');
 }
 
 
-function showPreview( content ) {
+function showPreview( ele, content ) {
     $('.preview').remove();
-    if ($(this).hasClass('active'))
-         $(this).text('View');
+    if ($(ele).hasClass('active'))
+         $(ele).text('View');
     else {
-        $(this).parent().parent().append(content);
-        $(this).text('Close');
+        $(ele).parent().parent().append(content);
+        $(ele).text('Close');
     }
-    $(this).toggleClass('active');
+    $(ele).toggleClass('active');
     return false;
 }

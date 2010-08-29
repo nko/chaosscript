@@ -194,7 +194,7 @@ function app(app) {
                                     acceptTorrent(infoHex, torrentfile.torrent,
                                                   function() {
                                                       res.writeHead(302,
-                                                                    { Location: '/' + infoHex + '.html' });
+                                                                    { Location: '/' + infoHex });
                                                       res.end();
                                                   });
                                 } else {
@@ -218,19 +218,19 @@ function app(app) {
         var torrentItemString = '';
         recommendations.forEach(function(r) {
             console.log(r);
-            torrentItemString += Html.tag('li',[], Html.tag('a', {href:'/'+r.infoHex+'.html'},r.name));
+            torrentItemString += Html.tag('li',[], Html.tag('a', {href:'/'+r.infoHex},r.name));
         });
         res.writeHead(200, {});
         res.write(Html.index( torrentItemString ));
         res.end();
     });
-    app.get('/:infoHex.html', function(req, res) {
+    app.get('/:infoHex', function(req, res) {
         Model.getFileinfo(req.params.infoHex, function(error, fileinfo) {
                               if (error === 'Not found') {
                                   res.writeHead(404, {});
                                   res.end('Not found');
                               } else if (fileinfo) {
-                                  var files = Model.parseTreeByFiles(fileinfo.files);
+                                  var files = Model.parseTreeByFiles(fileinfo.files, req.params.infoHex);
                                   console.log(files);
                                   res.writeHead(200, {});
                                   res.write(Html.show(files));
