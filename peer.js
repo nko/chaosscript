@@ -149,6 +149,7 @@ Peer.prototype.onPkt = function(pkt) {
            });
 
     pkt.on('pieceBegin', function(index, begin) {
+	       console.log('pieceBegin '+index+' '+begin);
                that.reqs = that.reqs.filter(function(req) {
                                                 return req.index === index &&
                                                     req.begin === begin;

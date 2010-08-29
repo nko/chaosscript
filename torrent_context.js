@@ -159,7 +159,6 @@ TorrentContext.prototype.workStreams = function() {
                                  var index = Math.floor(desire.offset / that.pieceLength);
                                  var peer = that.getPieceCandidate(index);
                                  if (peer) {
-				     console.log({desire:desire,pieceLength:that.pieceLength,requestPiece:[index,desire.offset % that.pieceLength, desire.length]});
 				     try {
 					 peer.requestPiece(index, desire.offset % that.pieceLength, desire.length);
 					 desire.requested();
