@@ -9,6 +9,7 @@ var types = {
     jpg: 'image/jpeg',
     gif: 'image/gif',
     png: 'image/png',
+    bmp: 'image/x-bmp',
     mpg: 'video/mpeg',
     mpeg: 'video/mpeg',
     mp2: 'video/mpeg',
