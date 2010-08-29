@@ -68,8 +68,7 @@ function routingMiddleware(req, res, next) {
 	}
 	idx = idx % BACKEND_PORTS.length;
 
-	console.log({proxyTo:{idx:idx,port:BACKEND_PORTS[idx]}});
-	req.proxyTo(BACKEND_PORTS, BACKEND_PORTS[idx]);
+	req.proxyTo(BACKEND_HOST, BACKEND_PORTS[idx]);
     }
 };
 
