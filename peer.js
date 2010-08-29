@@ -56,6 +56,12 @@ Peer.prototype.connect = function() {
                    });
 };
 
+Peer.prototype.close = function() {
+    if (this.socket)
+	this.socket.end();
+    this.state = 'closed';
+}
+
 Peer.prototype.setupWire = function() {
     var that = this;
 

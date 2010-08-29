@@ -33,16 +33,26 @@ var TorrentContext = module.exports = function(tm, infoHex) {
                       });
 
     this.tryAnnounce();
-    setInterval(function() {
-                    if (that.streams.length > 0) {
-                        // Force a tracker request after 10s idleness,
-                        // don't bore our visitors.
-                        // This really puts load on the trackers if many
-                        // people were doing this. Luckily they don't.
-                        var force = that.lastActivity && (that.lastActivity < Date.now() - 10 * 1000);
-                        that.tryAnnounce(force);
-                    }
-                }, 2000);
+    this.announceInterval =
+	setInterval(function() {
+			if (that.streams.length > 0) {
+                            // Force a tracker request after 10s idleness,
+                            // don't bore our visitors.
+                            // This really puts load on the trackers if many
+                            // people were doing this. Luckily they don't.
+                            var force = that.lastActivity && (that.lastActivity < Date.now() - 10 * 1000);
+                            that.tryAnnounce(force);
+			}
+                    }, 2000);
+};
+
+TorrentContext.prototype.close = function() {
+    for(var host in this.peers) {
+	clearInterval(this.announceInterval);
+	if (this.workPeersTimeout)
+	    clearTimeout(this.workPeersTimeout);
+	this.peers[host].close();
+    }
 };
 
 TorrentContext.prototype.addPeer = function(host, port) {
@@ -63,6 +73,7 @@ TorrentContext.prototype.addIncomingPeer = function(sock, wire) {
 
     this.peers[host] = new Peer(this, { socket: sock,
 					wire: wire });
+    this.canWorkPeers();
     this.onActivity();
 };
 
@@ -70,28 +81,55 @@ TorrentContext.prototype.canWorkPeers = function() {
     var that = this;
 
     if (!this.workPeersScheduled) {
-        setTimeout(function() {
-                       that.workPeersScheduled = false;
-                       that.workPeers();
-                   }, 50);
+        this.workPeersTimeout =
+	    setTimeout(function() {
+			   that.workPeersScheduled = false;
+			   delete that.workPeersTimeout;
+			   that.workPeers();
+                       }, 50);
         this.workPeersScheduled = true;      
     }
 };
 
 TorrentContext.prototype.workPeers = function() {
-    var didSomething = false;
-    for(var host in this.peers) {
-        if (this.peers.hasOwnProperty(host)) {
-            if (this.peers[host].canConnect()) {
-                this.peers[host].connect();
-                didSomething = true;
-                break;
-            }
-        }
+    var didSomething = false, host, connectedPeers = 0;
+    for(host in this.peers) {
+	if (this.hasOwnProperty(host) &&
+	    this.peers[host].state == 'connected')
+	    connectedPeers++;
     }
 
-    if (didSomething)
+    // allow a measure of 20 peers per stream, plus 20 for readiness
+    var allowedPeers = this.streams.length * 20 + 20;
+
+    if (connectedPeers < allowedPeers) {
+	// Moar pls
+	for(host in this.peers) {
+            if (this.peers.hasOwnProperty(host)) {
+		if (this.peers[host].canConnect()) {
+                    this.peers[host].connect();
+                    didSomething = true;
+                    break;
+		}
+            }
+	}
+    } else if (connectedPeers > allowedPeers * 1.2) {
+	// Fed up!
+	var toKick = null;
+	for(var host in this.peers)
+	    if (this.peers.hasOwnProperty(host)) {
+		if (this.peers[host].state == 'connected' &&
+		    (!toKick || this.peers[host].score < toKick.score))
+		    toKick = this.peers[host];
+	    }
+	if (toKick)
+	    toKick.close();
+    }
+
+    if (didSomething) {
+	this.onInfoUpdate();
         this.canWorkPeers();
+    }
 };
 
 TorrentContext.prototype.workStreams = function() {

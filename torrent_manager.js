@@ -5,15 +5,32 @@ var WP = require('wire_protocol');
 var ctxs = {};
 module.exports = {
     get: function(infoHex) {
-	if (ctxs.hasOwnProperty(infoHex))
-	    return ctxs[infoHex];
-	else {
-	    return (ctxs[infoHex] = new TorrentContext(module.exports, infoHex));
-	}
+	var ctx = ctxs.hasOwnProperty(infoHex) ?
+	    ctxs[infoHex] :
+	    (ctxs[infoHex] = new TorrentContext(module.exports, infoHex));
+	ctx.lastGet = Date.now();
+	return ctx;
     },
 
     port: parseInt(process.env.WIRE_PORT || "6881", 10)
 };
+
+/**
+ * Clean loop
+ */
+setInterval(function() {
+		var now = Date.now();
+		for(var infoHex in ctxs)
+		    if (ctxs.hasOwnProperty(infoHex)) {
+			var ctx = ctxs[infoHex];
+			if (ctx.streams.length <= 0 &&
+			    ctx.lastGet <= now - 30 * 1000) {
+
+			    ctx.close();
+			    delete ctxs[infoHex];
+			}
+		    }
+	    }, 10 * 1000);
 
 /**
  * Wire listening stuff
