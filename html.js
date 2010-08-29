@@ -91,12 +91,13 @@ module.exports = {
         var method = 'show'+fileData['kind'];
         var r = '';
         var mime = '';
-        if (fileData['kind'] == 'Video') {
+        if (fileData['kind'].toLowerCase() == 'video') {
             var p = fileData['path'].toLowerCase();
-            if ((p.indexOf('xvid') == -1) || (p.indexOf('divx') == -1))
+            console.log(p);
+            if ((p.indexOf('xvid') == -1) && (p.indexOf('divx') == -1))
                 mime = ", '"+fileData['mime']+"'";
             else
-                mime = ", 'video/divx'" 
+                mime = ", 'video/divx'";
         }
         r += M.tag('a',{href:'#',
                         onclick:'return '+method+"(this, '"+escape(fileData['path'])+"'"+mime+");",

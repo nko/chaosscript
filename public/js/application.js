@@ -75,7 +75,7 @@ function showVideo( ele, path, mime ) {
     else
         inp = '<video width="'+w+'" height="'+h+'" controls><source src="'+path+'" type="'+mime+'" />This browser is not compatible with HTML 5 or the given codec.</video>';
     
-    return showPreview( ele, inp);
+    return showPreview( ele, '<div class="preview">'+inp+'</div>');
 }
 
 
