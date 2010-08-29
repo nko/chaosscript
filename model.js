@@ -74,7 +74,7 @@ module.exports = {
                 result[path[0]]['files'][scndPart]['type'] = 'file';
                 result[path[0]]['files'][scndPart]['kind'] = fType;
             } else { // File
-                result[path[0]]['type'] = ['file'];
+                result[path[0]]['type'] = 'file';
                 result[path[0]]['kind'] = fType;
             }
           });
@@ -90,7 +90,7 @@ module.exports = {
                 module.exports.getFileinfo(infoHex, function(error, fileinfo) {
                                                if (fileinfo)
                                                    results.push({ infoHex: infoHex,
-                                                                  name: fileinfo.name || 'Torrent file'
+                                                                  name: fileinfo.name.toString() || 'Torrent file'
                                                                 });
                                                walkRecommendations(infoHexes, results, cb);
                                            });

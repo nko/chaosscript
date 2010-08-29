@@ -17,11 +17,11 @@ Html.setTemplate('./public/template.htm');
 var recommendations = [];
 function updateRecommendations() {
     Model.getRecommendations(function(error, r) {
-				 if (r)
-				     recommendations = r;
-				 else
-				     console.log("Cannot get recommendations: " + error);
-			     });
+                 if (r)
+                     recommendations = r;
+                 else
+                     console.log("Cannot get recommendations: " + error);
+                 });
 }
 setInterval(updateRecommendations, 10 * 1000);
 updateRecommendations();
@@ -209,16 +209,17 @@ function app(app) {
                 var infoHex = req.params.infoHex;
                 var ctx = TorrentManager.get(infoHex);
 
-		ctx.waitInfo(function(info) {
-				 res.writeHead(200, {});
-				 res.end(JSON.stringify(info));
-			     });
+        ctx.waitInfo(function(info) {
+                 res.writeHead(200, {});
+                 res.end(JSON.stringify(info));
+                 });
             });
     app.get('/', function(req, res) {
         var torrentItemString = '';
         recommendations.forEach(function(r) {
-	    torrentItemString += Html.tag('li',[], Html.tag('a', {href:'/'+r.infoHex+'.html'},r.name));
-	});
+            console.log(r);
+            torrentItemString += Html.tag('li',[], Html.tag('a', {href:'/'+r.infoHex+'.html'},r.name));
+        });
         res.writeHead(200, {});
         res.write(Html.index( torrentItemString ));
         res.end();

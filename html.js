@@ -17,8 +17,8 @@ module.exports = {
     index: function( torrents ) {
         var M = module.exports;
         var someContent = M.tag( 'label', { for: 'fileinput' }, 'Stream a .torrent file' );
-	someContent += M.tag( 'input', { 'name':'torrentfile',
-					    'id':'fileinput',
+        someContent += M.tag( 'input', {    'name':'torrentfile',
+                                            'id':'fileinput',
                                             'type':'file',
                                             'class': 'fileinput'});
         someContent += M.tag('input', {'type':'submit', 'value':'Ok'});
@@ -69,10 +69,12 @@ module.exports = {
             var file = files[filename];
             var cont = (file['kind'] == 'unknown') ? M.tag('span',{},filename) : M.tag('a',{'href':'#'},filename);
             if (file['type'] == 'file') { // File
+                console.log(filename +' is a file');
                 cont += M.filemenuFor(filename,file);
                 filelist += M.tag('li',{'class':'file'}, cont);
             } else { // Directory
-                cont += M.generateFilelist(file['files']);
+                console.log(filename +' is a directory');
+                cont += M.tag('ul',{}, M.generateFilelist(file['files']));
                 filelist += M.tag('li',{'class':'opened-dir'}, cont );
             }
         }
