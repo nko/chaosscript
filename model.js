@@ -8,7 +8,11 @@ var FiletypeMapping = { mkv:'Video',
                         nfo:'Text',
                         js:'Text',
                         css:'Text',
-                        txt:'Text'};
+                        txt:'Text',
+                        jpg:'Graphic',
+                        jpeg:'Graphic',
+                        bmp:'Graphic',
+                        png:'Graphic'};
 redis.select(1);
 
 module.exports = {

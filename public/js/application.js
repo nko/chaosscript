@@ -9,17 +9,15 @@ $(document).ready(function() {
       var p = e.parent();
       if (p.hasClass('opened-dir') || p.hasClass('closed-dir'))
       {
-        p.toggleClass('opened-dir').toggleClass('closed-dir');
+          p.toggleClass('opened-dir').toggleClass('closed-dir');
       } else if (p.hasClass('file'))
-      {
-        e.next().toggle();
-      }
+            e.next().toggle();
       if (e.hasClass('selected'))
       {
-        $('.filetree a').removeClass('selected');
+          $('.filetree a').removeClass('selected');
       } else {
-        $('.filetree a').removeClass('selected');
-        e.addClass('selected');
+          $('.filetree a').removeClass('selected');
+          e.addClass('selected');
       }
       return false;
     });
@@ -57,7 +55,7 @@ function showText( path ) {
     return showPreview('<div class="preview"><iframe src="'+path+'">Sorry, no iframe for you</iframe></div>');
 }
 
-function showPicture( path ) {
+function showGraphic( path ) {
     path = unescape(path);
     return showPreview('<div class="preview"><img src="'+path+'" alt="preview"></div>');
 }

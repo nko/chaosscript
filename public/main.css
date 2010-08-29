@@ -84,7 +84,8 @@ li.opened-dir {
 }
 
 li.opened-dir ul {
-  visibility:visible;
+/*  visibility:visible;*/
+  display:block;
 }
 
 li.closed-dir {
@@ -92,7 +93,8 @@ li.closed-dir {
 }
 
 li.closed-dir ul {
-  visibility:hidden;
+/*  visibility:hidden;*/
+  display:none;
 }
 
 .right {
