@@ -20,6 +20,7 @@ var types = {
     mks: 'video/x-matroska',
     mka: 'audio/x-matroska',
     asf: 'video/x-ms-asf',
+    ogv: 'video/ogg',
     torrent: 'application/x-bittorrent'
 };
 
