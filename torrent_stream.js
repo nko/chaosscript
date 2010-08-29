@@ -3,7 +3,7 @@ var sys = require('sys');
 
 // what we request:
 var CHUNK_SIZE = 16 * 1024;
-var CACHED_CHUNKS = 40;
+var CACHED_CHUNKS = 10;
 
 function Stream(offset ,length) {
     EventEmitter.call(this);
@@ -18,11 +18,11 @@ sys.inherits(Stream, EventEmitter);
 
 Stream.prototype.growCache = function() {
     for(var o = this.offset;
-	o < this.length && o < this.offset + CACHED_CHUNKS * CHUNK_SIZE;
-	o += CHUNK_SIZE) {
+        o < this.length && o < this.offset + CACHED_CHUNKS * CHUNK_SIZE;
+        o += CHUNK_SIZE) {
 
-	if (!this.cache.hasOwnProperty(o))
-	    this.cache[o] = { last: 0 };
+        if (!this.cache.hasOwnProperty(o))
+            this.cache[o] = { last: 0 };
     }
 };
 
@@ -30,78 +30,90 @@ Stream.prototype.nextDesired = function() {
     var now = Date.now();
     var result;
     for(var o in this.cache) {
-	if (this.cache.hasOwnProperty(o)) {
-	    var desire = this.cache[o];
-	    // request the same piece every 4s
-	    if (!desire.data && desire.last <= now - 4 * 1000) {
-		// First things first
-		if (!result || o < result.offset)
-		    result = { offset: o,
-			       length: desire.length || CHUNK_SIZE };
+        if (this.cache.hasOwnProperty(o)) {
+            var desire = this.cache[o];
+
+	    if (desire.offset + desire.length <= o) {
+		// What's this doing here?
+		console.log('Eliminating orphaned desire ' + desire.offset + '..' + desire.length);
+		delete this.cache[o];
+		continue;
 	    }
-	}
+
+            // request the same piece every 10s
+            if (!desire.data && desire.last <= now - 10 * 1000) {
+                // First things first
+                if (!result || o < result.offset)
+                    result = { offset: Number(o),
+                               length: desire.length || CHUNK_SIZE };
+            }
+        }
     }
     if (result) {
-	this.cache[result.offset].last = now;
-console.log({nextDesired: result, begin:this.cache[this.offset]});
-	if (this.cache[this.offset].last === 0 && this.offset !== result.offset) {
-	    console.log({offset:this.offset,result:result});
-	    for(var o in this.cache) {
-		if (this.cache.hasOwnProperty(o))
-		    console.log({o:o, last:this.cache[o].last});
-	    }
-	    process.exit(1);
-	}
+	var that = this;
+	result.requested = function() {
+            that.cache[result.offset].last = now;
+	};
     }
     return result;
 };
 
 Stream.prototype.receive = function(offset, data) {
-    console.log({receive:offset, applicable: this.cache.hasOwnProperty(offset)});
-
     if (this.cache.hasOwnProperty(offset)) {
-	var desire = this.cache[offset];
-	desire.data = data.length <= CHUNK_SIZE ? data : data.slice(0, CHUNK_SIZE);
+        var desire = this.cache[offset];
+	if (desire.data)
+	    console.log(offset + ' leeched twice');
+        desire.data = data.length <= CHUNK_SIZE ? data : data.slice(0, CHUNK_SIZE);
 
-	if (data.length < CHUNK_SIZE) {
-	    // Too few data, create a smaller succeeding desire,
-	    // with last request set to now, so we can collect
-	    // succeeding buffers without re-requesting immediately.
-	    this.cache[offset + data.length] = { last: Date.now(),
-						 length: CHUNK_SIZE - data.length };
-	} else if (data.length > CHUNK_SIZE) {
-	    // Too many data, recurse for next chunk
-	    // (wasn't requested, shouldn't happen)
-	    this.receive(offset + CHUNK_SIZE, data.slice(CHUNK_SIZE, data.length));
-	}
+        if (data.length < CHUNK_SIZE) {
+            // Too few data, create a smaller succeeding desire,
+            // with last request set to now, so we can collect
+            // succeeding buffers without re-requesting immediately.
+            this.cache[offset + data.length] = { last: Date.now(),
+                                                 length: CHUNK_SIZE - data.length };
+        } else if (data.length > CHUNK_SIZE) {
+            // Too many data, recurse for next chunk
+            // (wasn't requested, shouldn't happen)
+            this.receive(offset + CHUNK_SIZE, data.slice(CHUNK_SIZE, data.length));
+        }
 
-	this.walkCaches();
+        this.walkCaches();
     }
 
+    // TODO: rm in production
     var s = '';
     for(var o = this.offset; o < this.offset + CACHED_CHUNKS * CHUNK_SIZE; o += CHUNK_SIZE) {
-	if (this.cache.hasOwnProperty(o))
-	    s += this.cache[o].data ? '+' : '-';
-	else
-	    s += '.';
+        if (this.cache.hasOwnProperty(o))
+            s += this.cache[o].data ? '+' : '-';
+        else
+            s += '.';
     }
     console.log(this.offset + ': ' + s);
 };
 
+// Resets cache entries
+Stream.prototype.cancelled = function(offset, length) {
+    for(var o in this.cache)
+        if (this.cache.hasOwnProperty(o)) {
+            if (offset <= o && offset + length >= o)
+                this.cache[o].last = 0;
+        }
+};
+
 Stream.prototype.walkCaches = function() {
     if (this.cache.hasOwnProperty(this.offset)) {
-	var desire = this.cache[this.offset];
-	if (desire.data) {
-	    delete this.cache[this.offset];  // before write() advances offset
-	    this.write(desire.data);
+        var desire = this.cache[this.offset];
+        if (desire.data) {
+            delete this.cache[this.offset];  // before write() advances offset
+            this.write(desire.data);
 
-	    this.growCache();
+            this.growCache();
 
-	    var that = this;
-	    process.nextTick(function() {
-				 that.walkCaches();
-			     });
-	}
+            var that = this;
+            process.nextTick(function() {
+                                 that.walkCaches();
+                             });
+        }
     }
 };
 

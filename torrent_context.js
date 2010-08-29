@@ -85,14 +85,15 @@ TorrentContext.prototype.workStreams = function() {
     var that = this;
 
     this.streams.forEach(function(stream) {
-			     var desire = stream.nextDesired();
-			     if (desire) {
-				 var index = Math.floor(desire.offset / that.pieceLength);
-				 var peer = that.getPieceCandidate(index);
-				 if (peer) {
+                             var desire = stream.nextDesired();
+                             if (desire) {
+                                 var index = Math.floor(desire.offset / that.pieceLength);
+                                 var peer = that.getPieceCandidate(index);
+                                 if (peer) {
                                      peer.requestPiece(index, desire.offset % that.pieceLength, desire.length);
-				 }
-			     }
+				     desire.requested();
+                                 }
+                             }
                          });
 };
 TorrentContext.prototype.onActivity = function() {
@@ -128,7 +129,7 @@ TorrentContext.prototype.receivePiece = function(index, begin, data) {
 
     var offset = this.pieceLength * index + begin;
     this.streams.forEach(function(stream) {
-			     stream.receive(offset, data);
+                             stream.receive(offset, data);
                        });
 };
 
@@ -150,13 +151,23 @@ TorrentContext.prototype.getPieceCandidate = function(index) {
     return candidate;
 };
 
+TorrentContext.prototype.cancelled = function(req) {
+    var that = this;
+
+    this.streams.forEach(function(stream) {
+                             var offset = req.index * that.pieceLength + req.begin;
+                             stream.cancelled(offset, req.length);
+                         });
+    this.onActivity();
+};
+
 TorrentContext.prototype.stream = function(offset, length) {
     var that = this;
 
     var stream = new TorrentStream(offset, length);
     stream.on('end', function() {
-		  that.streams.splice(that.streams.indexOf(stream), 1);
-	      });
+                  that.streams.splice(that.streams.indexOf(stream), 1);
+              });
     this.streams.push(stream);
 
     this.workStreams();
