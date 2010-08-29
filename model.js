@@ -7,14 +7,16 @@ var FiletypeMapping = { mkv:'Video',
                         mpeg2:'Video',
                         mpg:'Video',
                         mp4:'Video',
+                        divx:'Video',
+                        xvid:'Video',
                         nfo:'Text',
                         js:'Text',
                         css:'Text',
                         txt:'Text',
-                        jpg:'Graphic',
-                        jpeg:'Graphic',
-                        bmp:'Graphic',
-                        png:'Graphic'};
+                        jpg:'Image',
+                        jpeg:'Image',
+                        bmp:'Image',
+                        png:'Image'};
 redis.select(1);
 
 module.exports = {

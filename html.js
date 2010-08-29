@@ -90,7 +90,14 @@ module.exports = {
         var M = module.exports;
         var method = 'show'+fileData['kind'];
         var r = '';
-        var mime = (fileData['kind'] == 'Video') ? (", '"+fileData['mime']+"'") : '';
+        var mime = '';
+        if (fileData['kind'] == 'Video') {
+            var p = fileData['path'].toLowerCase();
+            if ((p.indexOf('xvid') == -1) || (p.indexOf('divx') == -1))
+                mime = ", '"+fileData['mime']+"'";
+            else
+                mime = ", 'video/divx'" 
+        }
         r += M.tag('a',{href:'#',
                         onclick:'return '+method+"(this, '"+escape(fileData['path'])+"'"+mime+");",
                         'class':'viewmovie'},'View');

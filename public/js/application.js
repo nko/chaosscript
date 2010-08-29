@@ -64,18 +64,16 @@ function showVideo( ele, path, mime ) {
     path = unescape(path);
     var w = '560';
     var h = '340';
-    switch(mime) {
-    case 'video/x-matroska':
-        inp = '<object classid="clsid:67DABFBF-D0AB-41fa-9C46-CC0F21721616" width="'+w+'" height="'+h+'" codebase="http://go.divx.com/plugin/DivXBrowserPlugin.cab"><param name="src" value="'+path+'" /><embed type="'+mime+'" src="'+path+'" width="'+w+'" height="'+h+'" pluginspage="http://go.divx.com/plugin/download/"></embed></object>'
-    case 'video/quicktime':
-        inp = '<OBJECT classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" width="'+w+'" height="'+h+'" codebase="http://www.apple.com/qtactivex/qtplugin.cab"><param name="src" value="'+path+'"><EMBED src="'+path+'" width="'+w+'" height="'+h+'" pluginspage="http://www.apple.com/quicktime/download/"></EMBED></OBJECT>'
-    case 'video/divx':
-        inp = '<object classid="clsid:67DABFBF-D0AB-41fa-9C46-CC0F21721616" width="'+w+'" height="'+h+'" codebase="http://go.divx.com/plugin/DivXBrowserPlugin.cab"><param name="src" value="'+path+'" /><embed type="'+mime+'" src="'+path+'" width="'+w+'" height="'+h+'" pluginspage="http://go.divx.com/plugin/download/"></embed></object>'
-    break;
-    default:
-        inp = '<video width="'+w+'" height="'+h+'" controls><source src="'+path+'" type="'+mime+'" />This browser is not compatible with HTML 5 or the given codec.</video>'
-    break;
-    }
+    
+    mp4arr = ['video/x-matroska', 'video/divx', 'video/x-matroska', 'video/mp4'];
+    qtarr = ['video/quicktime'];
+    
+    if (jQuery.inArray(mime, mp4arr) != -1)
+        inp = '<object classid="clsid:67DABFBF-D0AB-41fa-9C46-CC0F21721616" width="'+w+'" height="'+h+'" codebase="http://go.divx.com/plugin/DivXBrowserPlugin.cab"><param name="src" value="'+path+'" /><embed type="'+mime+'" src="'+path+'" width="'+w+'" height="'+h+'" pluginspage="http://go.divx.com/plugin/download/"></embed></object>';
+    else if (jQuery.inArray(mime, qtarr) != -1)
+        inp = '<OBJECT classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" width="'+w+'" height="'+h+'" codebase="http://www.apple.com/qtactivex/qtplugin.cab"><param name="src" value="'+path+'"><EMBED src="'+path+'" width="'+w+'" height="'+h+'" pluginspage="http://www.apple.com/quicktime/download/"></EMBED></OBJECT>';
+    else
+        inp = '<video width="'+w+'" height="'+h+'" controls><source src="'+path+'" type="'+mime+'" />This browser is not compatible with HTML 5 or the given codec.</video>';
     
     return showPreview( ele, inp);
 }
@@ -87,7 +85,7 @@ function showText( ele, path ) {
 }
 
 
-function showGraphic( ele, path ) {
+function showImage( ele, path ) {
     path = unescape(path);
     return showPreview( ele, '<div class="preview"><img src="'+path+'" alt="picture is loading..."></div>');
 }
