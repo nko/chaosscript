@@ -40,6 +40,7 @@ net.createServer(function(stream) {
 		 }).listen(module.exports.port, '0.0.0.0');
 
 
+// ✞ Once upon a time this was dead code ✞
 function hexChar(v) {
     if (v >= 0 && v <= 9)
         return v + 48;  // '0'
