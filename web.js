@@ -7,7 +7,7 @@ var Html = require('./html');
 var MIME = require('./mime');
 
 process.on('uncaughtException', function(e) {
-           console.log(e.stack ? e.stack : e.toString());
+           console.log('uncaughtException: ' + (e.stack ? e.stack : e.toString()));
        });
 
 Html.setTemplate('./public/template.htm');

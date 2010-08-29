@@ -14,6 +14,7 @@ function Peer(ctx, opts) {
         this.state = 'connected';
         this.host = opts.socket.remoteAddress;
         this.port = 6881;  // Uh, yeah
+	this.setupSocket();
         this.setupWire();
     } else
         throw 'Peer ctor opts';
@@ -30,6 +31,9 @@ Peer.prototype.connect = function() {
     var that = this;
 
     this.socket = net.createConnection(this.port, this.host);
+    // I hate that outgoing connections miss this:
+    this.socket.remoteAddress = this.host + ':' + this.port;
+    this.state = 'connecting';
     this.socket.on('connect', function() {
                        console.log("Connected to peer "+that.host+":"+that.port);
                        that.wire = new WP.WireInitiator(that.socket,
@@ -41,27 +45,51 @@ Peer.prototype.connect = function() {
                                         that.setupWire();
                                     });
                    });
-    this.socket.on('error', function() {
-                       delete that.socket;
-                       delete that.wire;
-                       that.state = 'bad';
-                       that.onActivity();
-                   });
-    this.socket.on('end', function() {
-                       console.log("Disconnected from peer "+that.host+":"+that.port);
-                       delete that.socket;
-                       delete that.wire;
-                       delete that.reqs;
-                       that.state = that.state == 'connected' ? 'closed' : 'bad';
-                       that.onActivity();
-                   });
+    this.setupSocket();
 };
 
+Peer.prototype.onDisconnect = function() {
+    var that = this;
+
+    delete this.socket;
+    delete this.wire;
+    this.choked = true;
+    if (this.reqs) {
+	this.reqs.forEach(function(req) {
+                          that.ctx.cancelled(req);
+                      });
+	delete this.reqs;
+    }
+
+    this.onActivity();
+};
+
+
 Peer.prototype.close = function() {
-    if (this.socket)
+    if (this.socket) {
+	console.log("peer close " + this.socket.remoteAddress);
         this.socket.end();
+	delete this.socket;	
+    }
     this.state = 'closed';
-}
+};
+
+Peer.prototype.setupSocket = function() {
+    var that = this;
+
+    this.socket.on('error', function(error) {
+		       console.log('Socket error for '+that.host+":"+that.port+" (" + that.state + '): ' + error);
+                       that.state = 'bad';
+		       that.onDisconnect();
+		   });
+    this.socket.on('end', function() {
+                       console.log("Disconnected from peer "+that.host+":"+that.port);
+		       console.log(new Error().stack);
+                       that.state = (that.state == 'connected') ? 'closed' : 'bad';
+		       that.socket.end();
+		       that.onDisconnect();
+                   });
+};
 
 Peer.prototype.setupWire = function() {
     var that = this;

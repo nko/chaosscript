@@ -70,6 +70,10 @@ function checkInfoHash(infoHash) {
 }
 
 net.createServer(function(stream) {
+		     stream.on('error', function(error) {
+				   console.log('accepted error: '+error);
+			       });
+
 		     var wire = new WP.WireAcceptor(stream, checkInfoHash, peerId);
 		     wire.on('established', function(infoHash, peerId) {
 				 var infoHex = binToHex(infoHash);

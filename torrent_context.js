@@ -33,9 +33,12 @@ var TorrentContext = module.exports = function(tm, infoHex) {
                       });
 
     this.tryAnnounce();
-    this.announceInterval =
+    this.interval =
 	setInterval(function() {
 			if (that.streams.length > 0) {
+			    // We could re-request pieces (from slow peers)
+			    that.workStreams();
+
                             // Force a tracker request after 10s idleness,
                             // don't bore our visitors.
                             // This really puts load on the trackers if many
@@ -48,7 +51,7 @@ var TorrentContext = module.exports = function(tm, infoHex) {
 
 TorrentContext.prototype.close = function() {
     for(var host in this.peers) {
-	clearInterval(this.announceInterval);
+	clearInterval(this.interval);
 	if (this.workPeersTimeout)
 	    clearTimeout(this.workPeersTimeout);
 	this.peers[host].close();
@@ -156,8 +159,13 @@ TorrentContext.prototype.workStreams = function() {
                                  var index = Math.floor(desire.offset / that.pieceLength);
                                  var peer = that.getPieceCandidate(index);
                                  if (peer) {
-                                     peer.requestPiece(index, desire.offset % that.pieceLength, desire.length);
-				     desire.requested();
+				     console.log({desire:desire,pieceLength:that.pieceLength,requestPiece:[index,desire.offset % that.pieceLength, desire.length]});
+				     try {
+					 peer.requestPiece(index, desire.offset % that.pieceLength, desire.length);
+					 desire.requested();
+				     } catch (e) {
+					 console.log("requestPiece to " + peer.socket.remoteAddress + ": " + e.toString());
+				     }
                                  }
                              }
                          });
@@ -285,7 +293,7 @@ TorrentContext.prototype.announce = function(url) {
     var u = URL.parse(url);
     var cl = http.createClient(u.port || 80, u.hostname);
     cl.on('error', function(e) {
-              console.log(e.stack ? e.stack : e.toString());
+              console.log("Tracker request: " + (e.stack ? e.stack : e.toString()));
           });
     var req = cl.request('GET', u.pathname + '?' + this.makeAnnounceQuery(),
                          {'Host': u.hostname});
