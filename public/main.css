@@ -238,6 +238,10 @@ pre {
   border:none;
   margin:auto auto;
 }
+.preview iframe {
+  background-color: white;
+  color: black;
+}
 
 .video {
   border-left:60px solid #000;
