@@ -55,6 +55,21 @@ TorrentContext.prototype.close = function() {
     }
 };
 
+TorrentContext.prototype.getStats = function() {
+    var stats = { peers: { total: 0, connected: 0 },
+		  downloaded: this.bytesDownloaded,
+		  streams: this.streams.length
+		};
+    for(var host in this.peers)
+	if (this.peers.hasOwnProperty(host)) {
+	    stats.peers.total++;
+	    if (this.peers[host].state == 'connected')
+		stats.peers.connected++;
+	}
+
+    return stats;
+};
+
 TorrentContext.prototype.addPeer = function(host, port) {
     if (!this.peers.hasOwnProperty(host)) {
         var peer = this.peers[host] = new Peer(this,

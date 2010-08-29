@@ -12,7 +12,27 @@ module.exports = {
 	return ctx;
     },
 
-    port: parseInt(process.env.WIRE_PORT || "6881", 10)
+    port: parseInt(process.env.WIRE_PORT || "6881", 10),
+
+    getStats: function() {
+	var stats = { torrents: 0,
+		      peers: { total: 0, connected: 0 },
+		      downloaded: 0,
+		      streams: 0
+		    };
+
+	for(var infoHex in ctxs)
+	    if (ctxs.hasOwnProperty(infoHex)) {
+		stats.torrents++;
+		var ctxStats = ctxs[infoHex].getStats();
+		stats.peers.total += ctxStats.peers.total;
+		stats.peers.connected += ctxStats.peers.connected;
+		stats.downloaded += ctxStats.downloaded;
+		stats.streams += ctxStats.streams;
+	    }
+
+	return stats;
+    }
 };
 
 /**
