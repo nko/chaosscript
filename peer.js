@@ -29,6 +29,7 @@ Peer.prototype.connect = function() {
                        that.wire.on('established', function() {
                                         console.log('established');
                                         that.state = 'connected';
+                                        that.score = 0;
                                         that.wire.bitfield(that.ctx.piecemap);
                                         that.wire.interested();
                                     });
@@ -62,6 +63,17 @@ Peer.prototype.onPkt = function(pkt) {
                that.choked = false;
                console.log(that.host+':'+that.port+" unchoked, ready=" + that.isReady());
                that.onActivity();
+
+               // Unchoked? Decrease score periodically...
+               var downScoring, intervalId;
+               downScoring = function() {
+                   if (that.choked || !that.socket)
+                       clearInterval(intervalId);
+                   else
+                       that.score -= 5000;
+                       
+               };
+               intervalId = setInterval(downScoring, 1000);
            });
     pkt.on('choke', function() {
                that.choked = true;
@@ -80,9 +92,12 @@ Peer.prototype.onPkt = function(pkt) {
            });
 
     pkt.on('piece', function(index, begin, data) {
+               console.log('piece');
                that.ctx.receivePiece(index, begin, data);
+               that.score += data.length;
            });
     pkt.on('pieceEnd', function() {
+               console.log('pieceEnd');
                that.queue--;
                that.onActivity();
            });

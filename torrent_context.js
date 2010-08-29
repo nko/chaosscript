@@ -104,23 +104,23 @@ TorrentContext.prototype.onActivity = function() {
 
 TorrentContext.prototype.onInfoUpdate = function() {
     if (this.infoWaiters) {
-	info = { peers: { total: 0 } };
-	this.peers.forEach(function(peer) {
-			       if (!info.peers.hasOwnProperty(peer.state))
-				   info.peers[peer.state] = 0;
-			       info.peers[peer.state]++;
-			       info.peers.total++;
-			   });
-	this.infoWaiters.forEach(function(cb) {
-				     cb(info);
-				 });
-	delete this.infoWaiters;
+        info = { peers: { total: 0 } };
+        this.peers.forEach(function(peer) {
+                               if (!info.peers.hasOwnProperty(peer.state))
+                                   info.peers[peer.state] = 0;
+                               info.peers[peer.state]++;
+                               info.peers.total++;
+                           });
+        this.infoWaiters.forEach(function(cb) {
+                                     cb(info);
+                                 });
+        delete this.infoWaiters;
     }
 };
 
 TorrentContext.prototype.waitInfo = function(cb) {
     if (this.infoWaiters === undefined)
-	this.infoWaiters = [];
+        this.infoWaiters = [];
     this.infoWaiters.push(cb);
 }
 
@@ -139,16 +139,18 @@ TorrentContext.prototype.receivePiece = function(index, begin, data) {
 TorrentContext.prototype.getPieceCandidate = function(index) {
     var candidate;
     for(var host in this.peers) {
-        if (this.peers.hasOwnProperty(host) && this.peers[host].isReady()) {
-            if (this.peers[host].isReady() &&
-                this.peers[host].hasPiece(index)) {
+        var peer;
+        if ((peer = this.peers[host]) && peer.isReady()) {
+            if (peer.isReady() &&
+                peer.hasPiece(index)) {
 
-                // TODO: scoring :-)
-                candidate = this.peers[host];
-                break;
+                if (!candidate || candidate.score < peer.score)
+                    candidate = peer;
             }
         }
     }
+    if (candidate)
+        console.log({candidateScore: candidate.score});
     return candidate;
 };
 
@@ -237,7 +239,7 @@ TorrentContext.prototype.announce = function(url) {
                                      peers.forEach(function(peer) {
                                                        that.addPeer(peer.host, peer.port);
                                                    });
-				     that.onInfoUpdate();
+                                     that.onInfoUpdate();
                                  }
                              });
                } else {
