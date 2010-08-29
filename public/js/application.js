@@ -9,7 +9,7 @@ $(document).ready(function() {
         var p = e.parent();
         if (p.hasClass('filemenu'))
             return true;
-        var filemenu = e.next();
+        var filemenu = p.children('.filemenu');
         var fmHidden = filemenu.is(":visible");
         $('.filemenu').hide();
         if (p.hasClass('opened-dir') || p.hasClass('closed-dir')) {
