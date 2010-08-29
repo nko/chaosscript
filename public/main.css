@@ -15,8 +15,9 @@ h1 {
   font-size: 70pt;
   color:#3B434D;
 }
+
 h1 a, h1 a:hover {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 a img {
@@ -164,7 +165,6 @@ pre {
   background-color:#000;
   width:650px; /* 560 + Rahmen */
   color:#FF1900;
-  font-family:;
 }
 
 .preview img {

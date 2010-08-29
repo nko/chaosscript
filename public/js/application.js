@@ -68,7 +68,6 @@ function showPreview( content ) {
     if ($(this).hasClass('active'))
          $(this).text('View');
     else {
-        path = unescape(path);
         $(this).parent().parent().append(content);
         $(this).text('Close');
     }
