@@ -12,9 +12,12 @@ module.exports = {
             template = data;
         });
     },
-    show: function( files ) {
+    show: function( torrentname, files ) {
         var M = module.exports;
-        var someContent = M.tag('div', {'class':'metainfos'}, 'Stinging the swarm...');
+        var someContent = '';
+        if (torrentname != '' && torrentname != '[object Object]')
+            someContent += M.tag('h2', {}, torrentname);
+        someContent += M.tag('div', {'class':'metainfos'}, 'Stinging the swarm...');
         var filelist = M.generateFilelist( files );
         someContent += M.tag('ul', {'class':'filetree'}, filelist);
         someContent += M.tag('p',{'class':'bottom'},'');
@@ -81,8 +84,6 @@ module.exports = {
                 fList += M.tag('li',{'class':'file'}, cont);
             } else { // Directory
                 cont =  M.tag('a',{'href':'#'},filename);
-                console.log('########################');
-                console.log(file['files']);
                 var n = 0;
                 file['files'].forEach(function(e){n++;});
                 cont += M.tag('span',{'class':'size'},'('+n+' files)');
@@ -99,7 +100,6 @@ module.exports = {
         var mime = '';
         if (fileData['kind'].toLowerCase() == 'video') {
             var p = fileData['path'].toLowerCase();
-            console.log(p);
             if ((p.indexOf('xvid') == -1) && (p.indexOf('divx') == -1))
                 mime = ", '"+fileData['mime']+"'";
             else

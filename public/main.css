@@ -28,6 +28,18 @@ a img {
   border:none;
 }
 
+div.metainfos p {
+  font-size:16pt;
+}
+
+div.metainfos p span.middle {
+  font-size:20pt;
+}
+
+div.metainfos p span.large {
+  font-size:26pt;
+}
+
 .head {
   width:99%;
   vertical-align:top;

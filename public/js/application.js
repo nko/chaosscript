@@ -25,37 +25,37 @@ $(document).ready(function() {
 
     var m;
     if ((m = document.location.pathname.match(/\/([0-9a-f]{40})\./)))
-	pollInfo(m[1]);
+    pollInfo(m[1]);
 });
 
 var downloadedBefore, lastPoll;
 function pollInfo(infoHex) {
     $.ajax({ url: '/' + infoHex + '.json',
-	     dataType: 'json',
-	     success: function(info) {
-		 var now = Date.now();
-		 var s = (info.peers.connected || 0) + '/' +
-		     (info.peers.total || 0) + ' peers connected';
-		 if (downloadedBefore && lastPoll) {
-		     var rate = Math.round((info.downloaded - downloadedBefore) /
-					   (now - lastPoll));
-		     if (isNaN(rate) || rate < 0)
-			 rate = 0;
-		     s += ', leeching with ' + rate + ' KB/s';
-		 }
-		 $('.metainfos').text(s);
+         dataType: 'json',
+         success: function(info) {
+         var now = Date.now();
+         var s = '<span class="large">'+(info.peers.connected || 0) + '</span><span class="middle">/' +
+             (info.peers.total || 0) + '</span> peers connected';
+         if (downloadedBefore && lastPoll) {
+             var rate = Math.round((info.downloaded - downloadedBefore) /
+                       (now - lastPoll));
+             if (isNaN(rate) || rate < 0)
+             rate = 0;
+             s += ', leeching with <span class="middle">' + rate + ' KB/s</span>';
+         }
+         $('.metainfos').text(s);
 
-		 lastPoll = now;
-		 downloadedBefore = info.downloaded;
+         lastPoll = now;
+         downloadedBefore = info.downloaded;
 
-		 pollInfo(infoHex);
-	     },
-	     error: function() {
-		 setTimeout(function() {
-				pollInfo(infoHex);
-			    }, 1000);
-	     }
-	   });
+         pollInfo(infoHex);
+         },
+         error: function() {
+         setTimeout(function() {
+                pollInfo(infoHex);
+                }, 1000);
+         }
+       });
 }
 
 function showVideo( ele, path, mime ) {

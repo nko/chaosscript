@@ -227,7 +227,7 @@ function app(app) {
                                       } else if (fileinfo) {
                                           var files = Model.parseTreeByFiles(fileinfo.files, req.params.infoHex);
                                           res.writeHead(200, {});
-                                          res.write(Html.show(files));
+                                          res.write(Html.show(fileinfo.name.toString(),files));
                                           res.end();
                                       } else
                                           throw error;
