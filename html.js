@@ -80,8 +80,11 @@ module.exports = {
     },
     filemenuFor: function( filename, fileData ) {
         var M = module.exports;
+        var method = 'show'+fileData['kind'];
         var r = '';
-        r += M.tag('a',{href:'#', 'class':'viewmovie'},'View');
+        r += M.tag('a',{href:'#',
+                        onclick:'return '+method+"('"+escape(filename)+"');",
+                        'class':'viewmovie'},'View');
         r += M.tag('a',{href:'#'},'Url');
         return M.tag('div', {'class':'filemenu'}, r);
     }

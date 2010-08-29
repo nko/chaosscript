@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    $('.video').hide();
+    $('.preview').hide();
     $('.opened-dir').removeClass('opened-dir').addClass('closed-dir');
     $('.filemenu').hide();
     $('.video').hide();
@@ -23,18 +23,6 @@ $(document).ready(function() {
       }
       return false;
     });
-    
-    $('.viewmovie').bind('click', function() {
-      $('.video').remove();
-      if ($(this).hasClass('active'))
-      {
-         $(this).text('View');
-      } else {
-         $(this).parent().parent().append('<div class="video"><video width="560" height="340" controls><source src="somevideo.mp4" type=\'video/mp4; codecs="avc1.42E01E, mp4a.40.2"\'><source src="somevideo.ogv" type=\'video/ogg; codecs="theora, vorbis"\'><object width="640" height="384" type="application/x-shockwave-flash" data="somevideo.bla"><param name="movie" value="somevideo.bla" /></object></video></div>');
-         $(this).text('Close');
-     }
-     $(this).toggleClass('active');
-    });
 
     var m;
     if ((m = document.location.pathname.match(/\/([0-9a-f]{40})\./)))
@@ -56,4 +44,34 @@ function pollInfo(infoHex) {
 			    }, 1000);
 	     }
 	   });
+}
+
+function showVideo( path ) {
+    path = unescape(path);
+    return showPreview('<div class="preview video"><video width="560" height="340" controls><source src="'+path+'" type=\'video/mp4; codecs="avc1.42E01E, mp4a.40.2"\'><source src="'+path+'" type=\'video/ogg; codecs="theora, vorbis"\'><object width="640" height="384" type="application/x-shockwave-flash" data="'+path+'"><param name="movie" value="'+path+'" /></object></video></div>');
+}
+
+
+function showText( path ) {
+    path = unescape(path);
+    return showPreview('<div class="preview"><iframe src="'+path+'">Sorry, no iframe for you</iframe></div>');
+}
+
+function showPicture( path ) {
+    path = unescape(path);
+    return showPreview('<div class="preview"><img src="'+path+'" alt="preview"></div>');
+}
+
+
+function showPreview( content ) {
+    $('.preview').remove();
+    if ($(this).hasClass('active'))
+         $(this).text('View');
+    else {
+        path = unescape(path);
+        $(this).parent().parent().append(content);
+        $(this).text('Close');
+    }
+    $(this).toggleClass('active');
+    return false;
 }

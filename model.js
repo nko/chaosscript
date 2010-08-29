@@ -1,14 +1,14 @@
 var RedisClient = require('redis-client-0.3.5');
 var redis = RedisClient.createClient();
-var FiletypeMapping = { mkv:'video',
-                        avi:'video',
-                        mpeg:'video',
-                        mpeg2:'video',
-                        mpg:'video',
-                        nfo:'text',
-                        js:'text',
-                        css:'text',
-                        txt:'text'};
+var FiletypeMapping = { mkv:'Video',
+                        avi:'Video',
+                        mpeg:'Video',
+                        mpeg2:'Video',
+                        mpg:'Video',
+                        nfo:'Text',
+                        js:'Text',
+                        css:'Text',
+                        txt:'Text'};
 redis.select(1);
 
 module.exports = {
