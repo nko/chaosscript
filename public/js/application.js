@@ -96,7 +96,7 @@ function showPreview( ele, content ) {
     if ($(ele).hasClass('active'))
          $(ele).text('View');
     else {
-        $(ele).parent().parent().append(content);
+        $(ele).parent().parent().append($(content).hide()).find("div.preview").slideDown('slow');
         $(ele).text('Close');
     }
     $(ele).toggleClass('active');
