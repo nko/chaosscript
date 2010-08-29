@@ -74,26 +74,37 @@ module.exports = {
     },
     parseTreeByFiles: function( fileList, infohex ) {
         var result = {};
+        var fSizeLabels = [ ' byte', 'KB', 'MB', 'GB', 'TB' ];
         fileList.forEach(function(f) {
             var path = f.name.split('/');
             var fType = f.name.match(/\.([^.]+)$/gi).toString();
+            var fSize = parseInt(f.length);
+            for(i = 0; i < fSizeLabels.length; i += 1)
+                if ((fSize > 1024) && fSizeLabels.length >= i)
+                    fSize = fSize/1024;
+                else {
+                    fSize = (Math.round(fSize*100)/100)+''+fSizeLabels[i];
+                    break;
+                }
+                    
             fType = fType.substring(1,fType.length).toLowerCase();
             fType = (FiletypeMapping[fType] || 'unknown');
+            var attrs = {'kind':fType,
+                          'path':infohex+'/'+f.name,
+                          'mime':MIME.fileType(f.name),
+                          'type':'file',
+                          'size':fSize }
             result[path[0]] = (result[path[0]] || {});
             if (path.length > 1) { // Directory
                 result[path[0]]['type'] = 'directory';
                 result[path[0]]['files'] = (result[path[0]]['files'] || {});
                 var scndPart = path.slice(1,path.size).join('/');
                 result[path[0]]['files'][scndPart] = (result[path[0]]['files'][scndPart] || {});
-                result[path[0]]['files'][scndPart]['type'] = 'file';
-                result[path[0]]['files'][scndPart]['kind'] = fType;
-                result[path[0]]['files'][scndPart]['path'] = infohex+'/'+f.name;
-                result[path[0]]['files'][scndPart]['mime'] = MIME.fileType(f.name);
+                for(k in attrs)
+                    result[path[0]]['files'][scndPart][k] = attrs[k];
             } else { // File
-                result[path[0]]['type'] = 'file';
-                result[path[0]]['kind'] = fType;
-                result[path[0]]['path'] = infohex+'/'+f.name;
-                result[path[0]]['mime'] = MIME.fileType(f.name);
+                for(k in attrs)
+                    result[path[0]][k] = attrs[k];
             }
           });
         return result;

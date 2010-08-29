@@ -73,12 +73,17 @@ module.exports = {
         var fList = '';
         for (var filename in files) {
             var file = files[filename];
-            var cont = (file['kind'] == 'unknown') ? M.tag('span',{},filename) : M.tag('a',{'href':'#'},filename);
+            var cont =  M.tag('a',{'href':((file['kind'] == 'unknown') ? ('/'+file['path']) : '#')},filename);
             if (file['type'] == 'file') { // File
-//                console.log(filename +' is a file');
+                cont += M.tag('span',{},'('+file['size']+')');
                 cont += M.filemenuFor(file);
                 fList += M.tag('li',{'class':'file'}, cont);
             } else { // Directory
+                console.log('########################');
+                console.log(file['files']);
+                var n = 0;
+                file['files'].forEach(function(e){n++;});
+                cont += M.tag('span',{},'('+n+' files)');
                 cont += M.tag('ul',{}, M.generateFilelist(file['files']));
                 fList += M.tag('li',{'class':'opened-dir'}, cont );
             }
