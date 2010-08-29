@@ -86,7 +86,8 @@ Peer.prototype.setupSocket = function() {
                        console.log("Disconnected from peer "+that.host+":"+that.port);
 		       console.log(new Error().stack);
                        that.state = (that.state == 'connected') ? 'closed' : 'bad';
-		       that.socket.end();
+		       if (that.socket)
+			   that.socket.end();
 		       that.onDisconnect();
                    });
 };
