@@ -165,6 +165,7 @@ function streamer(req, res, next) {
                                                     res.end();
                                                 });
                                       res.writeHead(resHeaders['Content-Range'] ? 206 : 200, resHeaders);
+                                      res.socket.setKeepAlive(true, 5000);
                                   }
                               } else
                                   throw error;
