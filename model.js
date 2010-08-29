@@ -1,5 +1,14 @@
 var RedisClient = require('redis-client-0.3.5');
 var redis = RedisClient.createClient();
+var FiletypeMapping = { mkv:'video',
+                        avi:'video',
+                        mpeg:'video',
+                        mpeg2:'video',
+                        mpg:'video',
+                        nfo:'text',
+                        js:'text',
+                        css:'text',
+                        txt:'text'};
 redis.select(1);
 
 module.exports = {
@@ -53,18 +62,22 @@ module.exports = {
         var result = {};
         fileList.forEach(function(f) {
             var path = f.name.split('/');
-            for(var i = 0; i < path.length; i++) {
-                result[path[i]] = (result[path[i]] || {});
-                if (path.length > 1) { // Directory
-                    result[path[i]]['type'] = 'directory';
-                    result[path[i]]['files'] = (result[path[i]]['files'] || {});
-                } else { // File
-                    result[path[i]]['type'] = ['file'];
-                }
+            var fType = f.name.match(/\.([^.]+)$/gi).toString();
+            fType = fType.substring(1,fType.length).toLowerCase();
+            fType = (FiletypeMapping[fType] || 'unknown');
+            result[path[0]] = (result[path[0]] || {});
+            if (path.length > 1) { // Directory
+                result[path[0]]['type'] = 'directory';
+                result[path[0]]['files'] = (result[path[0]]['files'] || {});
+                var scndPart = path.slice(1,path.size).join('/');
+                result[path[0]]['files'][scndPart] = (result[path[0]]['files'][scndPart] || {});
+                result[path[0]]['files'][scndPart]['type'] = 'file';
+                result[path[0]]['files'][scndPart]['kind'] = fType;
+            } else { // File
+                result[path[0]]['type'] = ['file'];
+                result[path[0]]['kind'] = fType;
             }
           });
-        fileList
-
         return result;
     },
 

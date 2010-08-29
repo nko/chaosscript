@@ -68,17 +68,17 @@ module.exports = {
         for (var filename in files) {
             var file = files[filename];
             var cont = M.tag('a',{'href':'#'},filename+'');
-            if (file['type'] == 'file') {
-                cont += M.filemenuFor(file);
+            if (file['type'] == 'file') { // File
+                cont += M.filemenuFor(filename,file);
                 filelist += M.tag('li',{'class':'file'}, cont);
-            } else {
+            } else { // Directory
                 cont += M.generateFilelist(file['files']);
                 filelist += M.tag('li',{'class':'opened-dir'}, cont );
             }
         }
         return filelist;
     },
-    filemenuFor: function( fileData ) {
+    filemenuFor: function( filename, fileData ) {
         var M = module.exports;
         var r = '';
         r += M.tag('a',{href:'#', 'class':'viewmovie'},'View');
