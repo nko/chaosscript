@@ -43,11 +43,17 @@ function proxyMiddleware(req, res, next) {
 var BACKEND_HOST = "127.0.0.1";
 var BACKEND_PORTS = [8001, 8002, 8003, 8004];
 var rrIdx = 0;
+var toAny = {
+    "/": true,
+    "/up": true,
+    "/main.css": true,
+    "/favicon.ico": true
+};
 function routingMiddleware(req, res, next) {
-    var toAny = ["/", "/up", "/style.css", "/bitsuckr.png"];
-    if (toAny.some(function(path) {
-		       return path == req.url;
-		   })) {
+    if (toAny.hasOwnProperty(req.url) ||
+	/^\/js\//.test(req.url) ||
+	/^\/img\//.test(req.url)) {
+
 	req.proxyTo(BACKEND_HOST, BACKEND_PORTS[rrIdx]);
 
 	rrIdx = (rrIdx + 1) % BACKEND_PORTS.length;
