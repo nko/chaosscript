@@ -100,9 +100,13 @@ function showAudio( ele, path ) {
 
 function showPreview( ele, content ) {
     $('.preview').remove();
-    if ($(ele).hasClass('active'))
-         $(ele).text('View');
-    else {
+    $('.filemenu').children('.viewmovie').text('View');
+    
+    if ($(ele).hasClass('active')) {
+        $('.filemenu').children('.viewmovie').removeClass('active');
+        $(ele).addClass('active');
+        $(ele).text('View');
+    } else {
         $(ele).parent().parent().append($(content).hide()).find("div.preview").slideDown('slow');
         $(ele).text('Close');
     }
