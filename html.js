@@ -64,21 +64,20 @@ module.exports = {
     },
     generateFilelist: function( files ) {
         var M = module.exports;
-        filelist = '';
+        var fList = '';
         for (var filename in files) {
             var file = files[filename];
             var cont = (file['kind'] == 'unknown') ? M.tag('span',{},filename) : M.tag('a',{'href':'#'},filename);
             if (file['type'] == 'file') { // File
-                console.log(filename +' is a file');
+//                console.log(filename +' is a file');
                 cont += M.filemenuFor(filename,file);
-                filelist += M.tag('li',{'class':'file'}, cont);
+                fList += M.tag('li',{'class':'file'}, cont);
             } else { // Directory
-                console.log(filename +' is a directory');
                 cont += M.tag('ul',{}, M.generateFilelist(file['files']));
-                filelist += M.tag('li',{'class':'opened-dir'}, cont );
+                fList += M.tag('li',{'class':'opened-dir'}, cont );
             }
         }
-        return filelist;
+        return fList;
     },
     filemenuFor: function( filename, fileData ) {
         if (fileData['kind'] == 'unknown')
