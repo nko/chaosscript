@@ -23,7 +23,7 @@ Stream.prototype.growCache = function() {
 			       nextOffset = desire.offset + desire.length;
 		       });
     for(var o = nextOffset;
-        o < this.length && o < this.offset + CACHED_CHUNKS * CHUNK_SIZE;
+        o < this.offset + this.length && o < this.offset + CACHED_CHUNKS * CHUNK_SIZE;
         o += CHUNK_SIZE) {
 
         this.cache.push({ offset: o, length: CHUNK_SIZE, last: 0 });
