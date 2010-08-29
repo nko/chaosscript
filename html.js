@@ -86,8 +86,6 @@ module.exports = {
         return fList;
     },
     filemenuFor: function( fileData ) {
-        if (fileData['kind'] == 'unknown')
-            return '';
         var M = module.exports;
         var method = 'show'+fileData['kind'];
         var r = '';
@@ -100,9 +98,10 @@ module.exports = {
             else
                 mime = ", 'video/divx'";
         }
-        r += M.tag('a',{href:'#',
-                        onclick:'return '+method+"(this, '/"+escape(fileData['path'])+"'"+mime+");",
-                        'class':'viewmovie'},'View');
+	if (fileData.kind !== 'unknown')
+            r += M.tag('a',{href:'#',
+                            onclick:'return '+method+"(this, '/"+escape(fileData['path'])+"'"+mime+");",
+                            'class':'viewmovie'},'View');
         r += M.tag('a',{href:'/'+fileData['path']},'Download');
         return M.tag('div', {'class':'filemenu'}, r);
     }
