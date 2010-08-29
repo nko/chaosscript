@@ -88,6 +88,7 @@ a:hover, a:active {
 
 .left, .right, ul {
   text-align:left;
+  overflow-x:hidden;
 }
 
 .left, .right {
@@ -174,6 +175,9 @@ a.pleasevote {
   padding-top:60px;
   padding-bottom:10px;
   background-color:#FF0000;
+  box-shadow: 6px 6px 9px #000;
+  -webkit-box-shadow: 6px 6px 9px #000;
+  -moz-box-shadow: 6px 6px 9px #000;
 }
 
 .filemenu {
@@ -228,7 +232,7 @@ pre {
   margin:auto;
 }
 
-.preview iframe, .preview object {
+.preview iframe, .preview object, .preview audio {
   width:650px;
   height:600px;
   border:none;

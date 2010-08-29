@@ -105,7 +105,7 @@ module.exports = {
             else
                 mime = ", 'video/divx'";
         }
-	if (fileData.kind !== 'unknown')
+    if (fileData.kind !== 'unknown')
             r += M.tag('a',{href:'#',
                             onclick:'return '+method+"(this, '/"+escape(fileData['path'])+"'"+mime+");",
                             'class':'viewmovie'},'View');

@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    $('.preview').remove();
+//    $('.preview').remove();
     $('.opened-dir').removeClass('opened-dir').addClass('closed-dir');
     $('.video').hide();
     
@@ -12,8 +12,6 @@ $(document).ready(function() {
             p.children('ul').slideToggle('slow');
             p.toggleClass('opened-dir').toggleClass('closed-dir');
         }
-//        $('.filetree a').removeClass('selected');
-//        e.addClass('selected');
         return false;
     });
     
@@ -43,7 +41,7 @@ function pollInfo(infoHex) {
              rate = 0;
              s += ', leeching with <span class="middle">' + rate + ' KB/s</span>';
          }
-         $('.metainfos').text(s);
+         $('.metainfos').html(s);
 
          lastPoll = now;
          downloadedBefore = info.downloaded;
@@ -96,7 +94,7 @@ function showAudio( ele, path ) {
 
 /*function showunknown( ele, path ) {
     path = unescape(path);
-    return showPreview( ele, '<div class="preview"><input value="'+path+'" size="40" readonly></div>' );    
+    return showPreview( ele, '<div class="preview"><input value="'+path+'" size="40" readonly></div>' );
 }
 */
 
