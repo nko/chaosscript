@@ -15,6 +15,7 @@ var FiletypeMapping = { mkv:'Video',
                         mov:'Video',
                         mks:'Video',
                         asf:'Video',
+                        svg:'Text',  // iframe ;-)
                         nfo:'Text',
                         js:'Text',
                         css:'Text',
@@ -22,7 +23,17 @@ var FiletypeMapping = { mkv:'Video',
                         jpg:'Image',
                         jpeg:'Image',
                         bmp:'Image',
-                        png:'Image'};
+                        png:'Image',
+                        ogg:'Audio',
+                        mp3:'Audio',
+                        wav:'Audio',
+                        flac:'Audio',
+                        wma:'Audio',
+                        '3gp':'Audio',
+                        aac:'Audio',
+                        wma:'Audio',
+                        flac:'Audio',
+                        mka:'Audio'};
 redis.select(1);
 
 module.exports = {
