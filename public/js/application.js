@@ -5,13 +5,21 @@ $(document).ready(function() {
     $('.video').hide();
     
     $('.filetree a').bind('click', function() {
-        $('.filemenu').hide();
         var e = $(this);
         var p = e.parent();
-        if (p.hasClass('opened-dir') || p.hasClass('closed-dir'))
+        if (p.hasClass('filemenu'))
+            return true;
+        var filemenu = e.next();
+        var fmHidden = filemenu.is(":visible");
+        $('.filemenu').hide();
+        if (p.hasClass('opened-dir') || p.hasClass('closed-dir')) {
+            p.children('ul').slideToggle('slow');
             p.toggleClass('opened-dir').toggleClass('closed-dir');
-        else if (p.hasClass('file'))
-            e.next().toggle(); // filemenu
+        } else if (p.hasClass('file'))
+            if (fmHidden)
+                filemenu.toggle();
+            else
+                filemenu.slideToggle('slow');
         $('.filetree a').removeClass('selected');
         e.addClass('selected');
         return false;
@@ -52,9 +60,24 @@ function pollInfo(infoHex) {
 	   });
 }
 
-function showVideo( ele, path ) {
+function showVideo( ele, path, mime ) {
     path = unescape(path);
-    return showPreview( ele, '<div class="preview video"><video width="560" height="340" controls><source src="'+path+'" type=\'video/mp4; codecs="avc1.42E01E, mp4a.40.2"\'><source src="'+path+'" type=\'video/ogg; codecs="theora, vorbis"\'><object width="640" height="384" type="application/x-shockwave-flash" data="'+path+'"><param name="movie" value="'+path+'" /></object></video></div>');
+    var w = '560';
+    var h = '340';
+    switch(mime) {
+    case 'video/x-matroska':
+        inp = '<object classid="clsid:67DABFBF-D0AB-41fa-9C46-CC0F21721616" width="'+w+'" height="'+h+'" codebase="http://go.divx.com/plugin/DivXBrowserPlugin.cab"><param name="src" value="'+path+'" /><embed type="'+mime+'" src="'+path+'" width="'+w+'" height="'+h+'" pluginspage="http://go.divx.com/plugin/download/"></embed></object>'
+    case 'video/quicktime':
+        inp = '<OBJECT classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" width="'+w+'" height="'+h+'" codebase="http://www.apple.com/qtactivex/qtplugin.cab"><param name="src" value="'+path+'"><EMBED src="'+path+'" width="'+w+'" height="'+h+'" pluginspage="http://www.apple.com/quicktime/download/"></EMBED></OBJECT>'
+    case 'video/divx':
+        inp = '<object classid="clsid:67DABFBF-D0AB-41fa-9C46-CC0F21721616" width="'+w+'" height="'+h+'" codebase="http://go.divx.com/plugin/DivXBrowserPlugin.cab"><param name="src" value="'+path+'" /><embed type="'+mime+'" src="'+path+'" width="'+w+'" height="'+h+'" pluginspage="http://go.divx.com/plugin/download/"></embed></object>'
+    break;
+    default:
+        inp = '<video width="'+w+'" height="'+h+'" controls><source src="'+path+'" type="'+mime+'" />This browser is not compatible with HTML 5 or the given codec.</video>'
+    break;
+    }
+    
+    return showPreview( ele, inp);
 }
 
 

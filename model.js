@@ -1,3 +1,4 @@
+var MIME = require('./mime');
 var RedisClient = require('redis-client-0.3.5');
 var redis = RedisClient.createClient();
 var FiletypeMapping = { mkv:'Video',
@@ -79,10 +80,12 @@ module.exports = {
                 result[path[0]]['files'][scndPart]['type'] = 'file';
                 result[path[0]]['files'][scndPart]['kind'] = fType;
                 result[path[0]]['files'][scndPart]['path'] = infohex+'/'+f.name;
+                result[path[0]]['files'][scndPart]['mime'] = MIME.fileType(f.name);
             } else { // File
                 result[path[0]]['type'] = 'file';
                 result[path[0]]['kind'] = fType;
                 result[path[0]]['path'] = infohex+'/'+f.name;
+                result[path[0]]['mime'] = MIME.fileType(f.name);
             }
           });
         return result;
