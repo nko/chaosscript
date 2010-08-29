@@ -6,17 +6,17 @@ function Peer(ctx, opts) {
     this.ctx = ctx;
     this.state = 'unknown';
     if (opts.host && opts.port) {
-	this.host = opts.host;
-	this.port = opts.port;
+        this.host = opts.host;
+        this.port = opts.port;
     } else if (opts.socket && opts.wire) {
-	this.socket = opts.socket;
-	this.wire = opts.wire;
-	this.state = 'connected';
-	this.host = opts.socket.remoteAddress;
-	this.port = 6881;  // Uh, yeah
-	this.setupWire();
+        this.socket = opts.socket;
+        this.wire = opts.wire;
+        this.state = 'connected';
+        this.host = opts.socket.remoteAddress;
+        this.port = 6881;  // Uh, yeah
+        this.setupWire();
     } else
-	throw 'Peer ctor opts';
+        throw 'Peer ctor opts';
 
     this.choked = true;
 }
@@ -37,14 +37,15 @@ Peer.prototype.connect = function() {
                                                         that.ctx.peerId);
                        that.wire.on('established', function() {
                                         that.state = 'connected';
-					that.setupWire();
-				    });
+                                        that.choked = true;
+                                        that.setupWire();
+                                    });
                    });
     this.socket.on('error', function() {
                        delete that.socket;
                        delete that.wire;
                        that.state = 'bad';
-                       this.choked = true;
+                       that.onActivity();
                    });
     this.socket.on('end', function() {
                        console.log("Disconnected from peer "+that.host+":"+that.port);
@@ -52,13 +53,13 @@ Peer.prototype.connect = function() {
                        delete that.wire;
                        delete that.reqs;
                        that.state = that.state == 'connected' ? 'closed' : 'bad';
-                       this.choked = true;
+                       that.onActivity();
                    });
 };
 
 Peer.prototype.close = function() {
     if (this.socket)
-	this.socket.end();
+        this.socket.end();
     this.state = 'closed';
 }
 
@@ -107,14 +108,16 @@ Peer.prototype.onPkt = function(pkt) {
            });
     pkt.on('bitfield', function(piecemap) {
                that.piecemap = new PieceMap(piecemap);
-               that.onActivity();
+               if (!that.choked)
+                   that.onActivity();
            });
     pkt.on('have', function(index) {
                if (!that.piecemap && that.ctx.pieceNum)
                    that.piecemap = new PieceMap(that.ctx.pieceNum);
                if (that.piecemap)
                    that.piecemap.have(index);
-               that.onActivity();
+               if (!that.choked)
+                   that.onActivity();
            });
 
     pkt.on('pieceBegin', function(index, begin) {
@@ -133,9 +136,7 @@ Peer.prototype.onPkt = function(pkt) {
 };
 
 Peer.prototype.onActivity = function() {
-    if (!this.choked)
-        this.ctx.onActivity();
-
+    this.ctx.onActivity();
 };
 
 Peer.prototype.isReady = function() {
