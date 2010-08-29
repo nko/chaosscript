@@ -47,9 +47,23 @@ var TorrentContext = module.exports = function(tm, infoHex) {
 
 TorrentContext.prototype.addPeer = function(host, port) {
     if (!this.peers.hasOwnProperty(host)) {
-        var peer = this.peers[host] = new Peer(this, host, port);
+        var peer = this.peers[host] = new Peer(this,
+					       { host: host,
+						 port: port });
         this.canWorkPeers();
     }
+};
+
+TorrentContext.prototype.addIncomingPeer = function(sock, wire) {
+    // TODO: fix this, and the same in Peer() too
+    var host = sock.remoteAddress;
+
+    if (this.peers.hasOwnProperty(host))
+	this.peers[host].close();
+
+    this.peers[host] = new Peer(this, { socket: sock,
+					wire: wire });
+    this.onActivity();
 };
 
 TorrentContext.prototype.canWorkPeers = function() {
