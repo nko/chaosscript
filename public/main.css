@@ -104,6 +104,10 @@ li a, li span {
   padding-right:7px;
 }
 
+li.file {
+    clear: both;
+}
+
 li.file:hover{
   background-image:url(img/higlight.jpg);
   background-position:center center;

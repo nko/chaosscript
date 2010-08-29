@@ -111,7 +111,7 @@ function streamer(req, res, next) {
 
         webStats.stream++;
         var infoHex = m[1];
-        var filename = m[2];
+        var filename = unescape(m[2]);
 
         Model.getFileinfo(infoHex, function(error, fileinfo) {
                               if (error === 'Not found') {
