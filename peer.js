@@ -112,7 +112,7 @@ Peer.prototype.onActivity = function() {
 Peer.prototype.isReady = function() {
     return this.state === 'connected' &&
         !this.choked &&
-        this.queue < 4;
+        this.queue < 2;
 };
 
 Peer.prototype.canConnect = function() {
