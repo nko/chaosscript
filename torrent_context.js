@@ -2,13 +2,10 @@ var Model = require('./model');
 var BEnc = require('benc');
 var URL = require('url');
 var http = require('http');
-var EventEmitter = require('events').EventEmitter;
 var TM = require('./torrent_manager');
 var Peer = require('./peer');
 var PieceMap = require('piecemap');
-
-// what we request:
-var CHUNK_SIZE = 8 * 1024;
+var TorrentStream = require('./torrent_stream');
 
 var TorrentContext = module.exports = function(tm, infoHex) {
     var that = this;
@@ -88,12 +85,14 @@ TorrentContext.prototype.workStreams = function() {
     var that = this;
 
     this.streams.forEach(function(stream) {
-                             var index = Math.floor(stream.offset / that.pieceLength);
-                             var peer = that.getPieceCandidate(index);
-                             if (peer) {
-                                 var offset = stream.offset % that.pieceLength;
-                                 peer.requestPiece(index, offset, CHUNK_SIZE);
-                             }
+			     var desire = stream.nextDesired();
+			     if (desire) {
+				 var index = Math.floor(desire.offset / that.pieceLength);
+				 var peer = that.getPieceCandidate(index);
+				 if (peer) {
+                                     peer.requestPiece(index, desire.offset % that.pieceLength, desire.length);
+				 }
+			     }
                          });
 };
 TorrentContext.prototype.onActivity = function() {
@@ -129,10 +128,7 @@ TorrentContext.prototype.receivePiece = function(index, begin, data) {
 
     var offset = this.pieceLength * index + begin;
     this.streams.forEach(function(stream) {
-                             if (stream.offset >= offset && stream.offset <= offset + data.length) {
-                                 stream.write(data.slice(stream.offset - stream.offset,
-                                                         stream.length < data.length ? stream.length : data.length));
-                             }
+			     stream.receive(offset, data);
                        });
 };
 
@@ -157,20 +153,10 @@ TorrentContext.prototype.getPieceCandidate = function(index) {
 TorrentContext.prototype.stream = function(offset, length) {
     var that = this;
 
-    var stream = new EventEmitter();
-    stream.offset = offset;
-    stream.length = length;
-    stream.write = function(data) {
-        this.emit('data', data);
-        stream.offset += data.length;
-        stream.length -= data.length;
-        if (stream.length <= 0)
-            this.end();
-    };
-    stream.end = function() {
-        that.streams.splice(that.streams.indexOf(stream), 1);
-        this.emit('end');
-    };
+    var stream = new TorrentStream(offset, length);
+    stream.on('end', function() {
+		  that.streams.splice(that.streams.indexOf(stream), 1);
+	      });
     this.streams.push(stream);
 
     this.workStreams();
