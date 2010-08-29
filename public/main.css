@@ -188,10 +188,14 @@ pre {
   background-color:#000;
   width:650px; /* 560 + Rahmen */
   color:#FF1900;
+  background-image:url(img/loading.gif);
+  background-position:center center;
+  background-repeat:no-repeat;
 }
 
 .preview img {
   max-width:650px;
+  min-height:100px;
   margin:auto;
 }
 

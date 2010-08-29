@@ -194,7 +194,7 @@ function app(app) {
                                     acceptTorrent(infoHex, torrentfile.torrent,
                                                   function() {
                                                       res.writeHead(302,
-                                                                    { Location: '/' + infoHex });
+                                                                    { Location: '/' + infoHex + '.html' });
                                                       res.end();
                                                   });
                                 } else {
@@ -218,13 +218,13 @@ function app(app) {
         var torrentItemString = '';
         recommendations.forEach(function(r) {
             console.log(r);
-            torrentItemString += Html.tag('li',[], Html.tag('a', {href:'/'+r.infoHex},r.name));
+            torrentItemString += Html.tag('li',[], Html.tag('a', {href:'/'+r.infoHex + '.html'},r.name));
         });
         res.writeHead(200, {});
         res.write(Html.index( torrentItemString ));
         res.end();
     });
-    app.get('/:infoHex', function(req, res) {
+    app.get('/:infoHex.html', function(req, res) {
         Model.getFileinfo(req.params.infoHex, function(error, fileinfo) {
                               if (error === 'Not found') {
                                   res.writeHead(404, {});
