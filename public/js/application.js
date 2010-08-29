@@ -1,24 +1,20 @@
 $(document).ready(function() {
-    $('.preview').hide();
+    $('.preview').remove();
     $('.opened-dir').removeClass('opened-dir').addClass('closed-dir');
     $('.filemenu').hide();
     $('.video').hide();
     
     $('.filetree a').bind('click', function() {
-      var e = $(this);
-      var p = e.parent();
-      if (p.hasClass('opened-dir') || p.hasClass('closed-dir'))
-      {
-          p.toggleClass('opened-dir').toggleClass('closed-dir');
-      } else if (p.hasClass('file'))
-            e.next().toggle();
-      if (e.hasClass('selected'))
-          $('.filetree a').removeClass('selected');
-      else {
-          $('.filetree a').removeClass('selected');
-          e.addClass('selected');
-      }
-      return false;
+        $('.filemenu').hide();
+        var e = $(this);
+        var p = e.parent();
+        if (p.hasClass('opened-dir') || p.hasClass('closed-dir'))
+            p.toggleClass('opened-dir').toggleClass('closed-dir');
+        else if (p.hasClass('file'))
+            e.next().toggle(); // filemenu
+        $('.filetree a').removeClass('selected');
+        e.addClass('selected');
+        return false;
     });
 
     var m;
@@ -53,6 +49,7 @@ function showText( ele, path ) {
     path = unescape(path);
     return showPreview( ele, '<div class="preview"><iframe src="'+path+'">Sorry, no iframe for you</iframe></div>');
 }
+
 
 function showGraphic( ele, path ) {
     path = unescape(path);
