@@ -121,7 +121,7 @@ TorrentContext.prototype.waitInfo = function(cb) {
     if (this.infoWaiters === undefined)
         this.infoWaiters = [];
     this.infoWaiters.push(cb);
-}
+};
 
 TorrentContext.prototype.receivePiece = function(index, begin, data) {
     var that = this;
@@ -167,7 +167,7 @@ TorrentContext.prototype.stream = function(offset, length) {
 TorrentContext.prototype.refreshTrackers = function(cb) {
     var that = this;
     Model.getTrackers(this.infoHex, function(error, urls) {
-                          if (urls.forEach)
+                          if (urls && urls.forEach)
                               urls.forEach(function(url) {
                                                if (!that.trackers.hasOwnProperty(url) &&
                                                    /^http:/.test(url)) {
