@@ -15,8 +15,12 @@ var types = {
     mp2: 'video/mpeg',
     avi: 'video/x-msvideo',
     wmv: 'video/x-ms-wmv',
+    wma: 'audio/x-ms-wma',
+    aac: 'audio/aac',
+    '3gp': 'audio/3gpp',
     mov: 'video/quicktime',
     mp4: 'video/mp4',
+    m4v: 'video/mp4',
     mkv: 'video/x-matroska',
     mks: 'video/x-matroska',
     mka: 'audio/x-matroska',
@@ -27,7 +31,7 @@ var types = {
 
 module.exports = {
     fileType: function(path) {
-	var ext = path.split('/').pop().split('.').pop();
-	return types[ext] || 'binary/octet-stream';
+        var ext = path.split('/').pop().split('.').pop();
+        return types[ext] || 'binary/octet-stream';
     }
 };

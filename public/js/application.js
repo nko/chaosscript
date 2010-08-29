@@ -91,6 +91,17 @@ function showImage( ele, path ) {
 }
 
 
+function showAudio( ele, path ) {
+    path = unescape(path);
+    return showPreview( ele, '<div class="preview"><audio controls><source src="'+path+'"></audio></div>' );
+}
+
+/*function showunknown( ele, path ) {
+    path = unescape(path);
+    return showPreview( ele, '<div class="preview"><input value="'+path+'" size="40" readonly></div>' );    
+}
+*/
+
 function showPreview( ele, content ) {
     $('.preview').remove();
     if ($(ele).hasClass('active'))
