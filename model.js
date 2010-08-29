@@ -52,14 +52,15 @@ module.exports = {
     parseTreeByFiles: function( fileList ) {
         var result = {};
         fileList.forEach(function(f) {
-//            root = (new Buffer(f.name)).join('').split('/')[0];
-            path = f.name.split('/');
-            result[path[0]] = (result[path[0]] || {});
-            if (path.length > 1) { // Directory
-                result[path[0]]['type'] = 'directory';
-                result[path[0]]['files'] = (result[path[0]]['files'] || {});
-            } else { // File
-                result[path[0]]['type'] = ['file'];
+            var path = f.name.split('/');
+            for(var i = 0; i < path.length; i++) {
+                result[path[i]] = (result[path[i]] || {});
+                if (path.length > 1) { // Directory
+                    result[path[i]]['type'] = 'directory';
+                    result[path[i]]['files'] = (result[path[i]]['files'] || {});
+                } else { // File
+                    result[path[i]]['type'] = ['file'];
+                }
             }
           });
         fileList
@@ -99,4 +100,3 @@ module.exports = {
                   });
     }
 };
-

@@ -67,14 +67,23 @@ module.exports = {
         filelist = '';
         for (var filename in files) {
             var file = files[filename];
-            var fLink = M.tag('a',{'href':'#'},filename+'');
+            var cont = M.tag('a',{'href':'#'},filename+'');
             if (file['type'] == 'file') {
-                filelist += M.tag('li',{'class':'file'}, fLink);
+                cont += M.filemenuFor(file);
+                filelist += M.tag('li',{'class':'file'}, cont);
             } else {
-                filelist += M.tag('li',{'class':'opened-dir'}, fLink + M.generateFilelist(file['files']));
+                cont += M.generateFilelist(file['files']);
+                filelist += M.tag('li',{'class':'opened-dir'}, cont );
             }
         }
         return filelist;
+    },
+    filemenuFor: function( fileData ) {
+        var M = module.exports;
+        var r = '';
+        r += M.tag('a',{href:'#', 'class':'viewmovie'},'View');
+        r += M.tag('a',{href:'#'},'Url');
+        return M.tag('div', {'class':'filemenu'}, r);
     }
 
 };
