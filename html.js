@@ -67,7 +67,7 @@ module.exports = {
         filelist = '';
         for (var filename in files) {
             var file = files[filename];
-            var cont = M.tag('a',{'href':'#'},filename+'');
+            var cont = (file['kind'] == 'unknown') ? M.tag('span',{},filename) : M.tag('a',{'href':'#'},filename);
             if (file['type'] == 'file') { // File
                 cont += M.filemenuFor(filename,file);
                 filelist += M.tag('li',{'class':'file'}, cont);
@@ -79,6 +79,8 @@ module.exports = {
         return filelist;
     },
     filemenuFor: function( filename, fileData ) {
+        if (fileData['kind'] == 'unknown')
+            return '';
         var M = module.exports;
         var method = 'show'+fileData['kind'];
         var r = '';
