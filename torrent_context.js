@@ -16,7 +16,6 @@ var TorrentContext = module.exports = function(tm, infoHex) {
     this.peerId = generatePeerId();
     this.trackers = {};
     this.bytesDownloaded = 0;
-    this.bytesLeft = 1024 * 1024 * 1024;
     this.peers = {};
     this.size = 0;
     this.streams = [];
@@ -104,7 +103,8 @@ TorrentContext.prototype.onActivity = function() {
 
 TorrentContext.prototype.onInfoUpdate = function() {
     if (this.infoWaiters) {
-        info = { peers: { total: 0 } };
+        info = { peers: { total: 0 },
+		 downloaded: this.bytesDownloaded };
         this.peers.forEach(function(peer) {
                                if (!info.peers.hasOwnProperty(peer.state))
                                    info.peers[peer.state] = 0;
@@ -131,6 +131,7 @@ TorrentContext.prototype.receivePiece = function(index, begin, data) {
     this.streams.forEach(function(stream) {
                              stream.receive(offset, data);
                        });
+    this.bytesDownloaded += data.length;
 };
 
 TorrentContext.prototype.getPieceCandidate = function(index) {
@@ -259,7 +260,7 @@ TorrentContext.prototype.makeAnnounceQuery = function() {
         "&port=" + this.tm.port +
         "&uploaded=" + 0 +
         "&downloaded=" + this.bytesDownloaded +
-        "&left=" + this.bytesLeft +
+        "&left=" + this.size +
         "&event=started" +  // TODO: fix this
         "&compact=1";
 };
