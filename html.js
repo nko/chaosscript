@@ -100,7 +100,7 @@ module.exports = {
                 mime = ", 'video/divx'";
         }
         r += M.tag('a',{href:'#',
-                        onclick:'return '+method+"(this, '"+escape(fileData['path'])+"'"+mime+");",
+                        onclick:'return '+method+"(this, '/"+escape(fileData['path'])+"'"+mime+");",
                         'class':'viewmovie'},'View');
         r += M.tag('a',{href:'/'+fileData['path']},'Download');
         return M.tag('div', {'class':'filemenu'}, r);
