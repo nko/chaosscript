@@ -43,7 +43,7 @@ Stream.prototype.nextDesired = function() {
             // request the same piece every 4s
             if (!desire.data && desire.last <= now - 4 * 1000) {
                 // First things first
-                if (!result || o < result.offset)
+                if (!result || Number(o) < result.offset)
                     result = { offset: Number(o),
                                length: desire.length || CHUNK_SIZE };
             }
@@ -52,6 +52,7 @@ Stream.prototype.nextDesired = function() {
     if (result) {
 	var that = this;
 	result.requested = function() {
+	    console.log({requested:result.offset, offset:that.offset});
             that.cache[result.offset].last = now;
 	};
     }
@@ -59,6 +60,8 @@ Stream.prototype.nextDesired = function() {
 };
 
 Stream.prototype.receive = function(offset, data) {
+console.log({receive:offset,len:data.length});
+
     if (this.cache.hasOwnProperty(offset)) {
         var desire = this.cache[offset];
 	if (desire.data)
@@ -78,24 +81,22 @@ Stream.prototype.receive = function(offset, data) {
         }
 
         this.walkCaches();
+    } else {
+	// Find a match
+	for(var o in this.cache)
+	    if (this.cache.hasOwnProperty(o)) {
+		var desire = this.cache[o];
+		if (offset < Number(o) && offset + data.length >= Number(o))
+		    this.receive(Number(o), data.slice(Number(o) - offset, data.length));
+	    }
     }
-
-    // TODO: rm in production
-    var s = '';
-    for(var o = this.offset; o < this.offset + CACHED_CHUNKS * CHUNK_SIZE; o += CHUNK_SIZE) {
-        if (this.cache.hasOwnProperty(o))
-            s += this.cache[o].data ? '+' : '-';
-        else
-            s += '.';
-    }
-    console.log(this.offset + ': ' + s);
 };
 
 // Resets cache entries
 Stream.prototype.cancelled = function(offset, length) {
     for(var o in this.cache)
         if (this.cache.hasOwnProperty(o)) {
-            if (offset <= o && offset + length >= o)
+            if (offset <= Number(o) && offset + length >= Number(o))
                 this.cache[o].last = 0;
         }
 };
@@ -114,7 +115,19 @@ Stream.prototype.walkCaches = function() {
                                  that.walkCaches();
                              });
         }
+    } else
+	console.log('Inconsistency: no cache desire for current offset ' + this.offset);
+
+
+    // TODO: rm in production
+    var s = '';
+    for(var o in this.cache) {
+        if (this.cache.hasOwnProperty(o))
+            s += this.cache[o].data ? '+' : '-';
+        else
+            s += '.';
     }
+    console.log(this.offset + ': ' + s);
 };
 
 Stream.prototype.write = function(data) {
