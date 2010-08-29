@@ -158,7 +158,7 @@ function streamer(req, res, next) {
                                       }
                                       resHeaders['Content-Length'] = length;
 
-                                      var stream = ctx.stream(file.offset, file.length);
+                                      var stream = ctx.stream(offset, length);
                                       req.socket.on('end', function() {
                                                         stream.end();
                                                     });
